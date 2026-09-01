@@ -870,3 +870,4 @@ If Synkora saves you time, a star helps others find it.
 [Back to Top](#synkora)
 
 </div>
+# Auto-deploy enabled
