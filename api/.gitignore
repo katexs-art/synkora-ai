@@ -183,3 +183,5 @@ service-account.json
 # Local configuration
 .env.backup
 local_settings.py
+.env
+.env.local
