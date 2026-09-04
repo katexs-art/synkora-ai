@@ -3,6 +3,7 @@ Katexs product endpoints (MVP): auto-build, stats, embed.
 Sits on top of the core agent engine. Added 2026-09-04.
 """
 import html
+import json
 import logging
 import os
 import re
@@ -33,6 +34,18 @@ router = APIRouter(tags=["katexs"])
 DEFAULT_MODEL = os.environ.get("ANTHROPIC_MODEL", "claude-sonnet-4-5")
 WIDGET_URL = os.environ.get("KATEXS_WIDGET_URL", "https://app.katexs.tech/widget.js")
 APP_URL = os.environ.get("KATEXS_APP_URL", "https://app.katexs.tech")
+
+
+class DescribeBuildRequest(BaseModel):
+    description: str = Field(..., min_length=10, max_length=3000)
+    lane: str | None = Field(default=None)
+
+
+def _extract_lane(text: str) -> str:
+    t = text.lower()
+    if re.search(r"\b(voice|phone calls?|callers?|inbound calls?|telephone|after-hours|after hours)\b", t):
+        return "voice"
+    return "chat"
 
 
 class AutoBuildRequest(BaseModel):
@@ -333,3 +346,160 @@ async def agent_embed(
         "widget_id": str(widget.id),
         "embed": _embed_snippet(agent.slug, agent.id, plain_key),
     }
+
+
+@router.post("/describe-build")
+async def describe_build(
+    req: DescribeBuildRequest,
+    tenant_id: uuid.UUID = Depends(get_current_tenant_id),
+    account: Account = Depends(get_current_account),
+    db: AsyncSession = Depends(get_async_db),
+):
+    """Sim.ai-style: user describes the agent they want -> Claude plans it -> we assemble it."""
+    lane = req.lane if req.lane and req.lane in ("chat", "voice") else _extract_lane(req.description)
+    api_key_raw = os.environ.get("ANTHROPIC_API_KEY")
+    plan = None
+    if api_key_raw:
+        try:
+            system = (
+                "You plan AI agents for small businesses. Given a user's plain-English request, return STRICT JSON: "
+                "{\"business_name\": string (best name for the business/agent, e.g. 'Sunshine Dental'), "
+                "\"industry\": string, "
+                "\"services\": string (short summary of what the agent should handle), "
+                "\"agent_name\": string (short name for the agent, e.g. 'Sunshine Dental AI Assistant'), "
+                "\"greeting\": string (one-line greeting for chat/phone), "
+                "\"tools\": [string] (only from: booking, sms_reminders, crm_logging, faq_answers, qualify_leads), "
+                "\"voice_notes\": string (1 sentence voice behavior note, empty if not voice)}"
+            )
+            async with httpx.AsyncClient(timeout=45) as client:
+                resp = await client.post(
+                    "https://api.anthropic.com/v1/messages",
+                    headers={
+                        "x-api-key": api_key_raw,
+                        "anthropic-version": "2023-06-01",
+                        "content-type": "application/json",
+                    },
+                    json={
+                        "model": DEFAULT_MODEL,
+                        "max_tokens": 1200,
+                        "system": system,
+                        "messages": [{"role": "user", "content": req.description}],
+                    },
+                )
+                if resp.status_code == 200:
+                    data = resp.json()
+                    text = "".join(
+                        b.get("text", "") for b in data.get("content", []) if b.get("type") == "text"
+                    )
+                    m = re.search(r"\{[\s\S]*\}", text)
+                    if m:
+                        plan = json.loads(m.group(0))
+        except Exception:  # noqa: BLE001
+            logger.exception("describe-build planning failed")
+
+    # Fallback plan if Claude failed
+    if not plan:
+        biz = re.sub(r"\s+", " ", req.description)[:80]
+        plan = {
+            "business_name": biz,
+            "industry": "General",
+            "services": req.description,
+            "agent_name": None,
+            "greeting": "Hi there! How can I help you today?",
+            "tools": [],
+            "voice_notes": "",
+        }
+
+    business_name = (plan.get("business_name") or "").strip() or "My Business"
+    industry = (plan.get("industry") or "").strip() or "General"
+    services = (plan.get("services") or req.description).strip()
+    greeting = (plan.get("greeting") or "Hi there! How can I help you today?").strip()
+    tools = plan.get("tools") or []
+    voice_note = (plan.get("voice_notes") or "").strip()
+
+    # Build a rich system prompt
+    prompt_parts = [
+        f"You are {business_name}'s AI assistant — warm, professional, capable.",
+        f"### ABOUT THE BUSINESS\nIndustry: {industry}\nWhat they handle: {services}",
+    ]
+    if tools:
+        tool_lines = []
+        for t in tools:
+            tlow = t.lower()
+            if "booking" in tlow:
+                tool_lines.append("- Booking: collect name, phone, service and preferred time; confirm the slot before finishing.")
+            elif "sms" in tlow:
+                tool_lines.append("- SMS reminders: offer to send a confirmation/reminder text after booking.")
+            elif "crm" in tlow:
+                tool_lines.append("- CRM: capture lead details (name, phone, need) and note them for follow-up.")
+            elif "faq" in tlow:
+                tool_lines.append("- FAQ: answer common questions from knowledge; never invent prices/policies.")
+            elif "qualif" in tlow:
+                tool_lines.append("- Lead qualification: ask what they need, urgency, and best contact info.")
+        if tool_lines:
+            prompt_parts.append("### CAPABILITIES\n" + "\n".join(tool_lines))
+    if lane == "voice" and voice_note:
+        prompt_parts.append("### VOICE\nKeep replies short and natural for phone. " + voice_note)
+    prompt_parts.append(
+        "### RULES\n1. Only state facts you know; otherwise offer to have the owner follow up (capture contact). "
+        "2. Always collect name + phone/email when follow-up or booking is needed. "
+        "3. Never claim to be human. Stay in character as a member of the team. "
+        "4. Be brief, warm and natural."
+    )
+    system_prompt = "\n\n".join(prompt_parts)
+
+    agent_name = (plan.get("agent_name") or "").strip() or f"{business_name} AI Agent"
+    try:
+        agent = await _create_engine_agent(db, tenant_id, account, agent_name, services[:400], system_prompt, lane)
+    except HTTPException:
+        raise
+    except Exception as exc:  # noqa: BLE001
+        await db.rollback()
+        logger.exception("describe-build create failed")
+        raise HTTPException(status_code=500, detail=f"Agent build failed: {exc}") from exc
+
+    # voice provisioning
+    voice_status = None
+    if lane == "voice":
+        vcfg = {
+            "enabled": False, "provider": "vapi",
+            "greeting": greeting,
+            "end_call_message": "Thanks for calling — have a great day!",
+            "voice_provider": "elevenlabs", "voice_id": "EXAVITQu4vr4xnSDxMaL",
+            "language": "en", "max_duration_seconds": 300, "record_calls": False,
+        }
+        key = await PhoneConfigService.get_vapi_api_key(tenant_id, db)
+        base = getattr(app_settings, "app_base_url", "") or ""
+        if key and base:
+            try:
+                aid = await PhoneConfigService.register_webhook_with_vapi(agent.slug, key, base)
+                if aid:
+                    vcfg["enabled"] = True
+                    vcfg["vapi_assistant_id"] = aid
+            except Exception:  # noqa: BLE001
+                logger.exception("voice provisioning failed")
+        agent.phone_config = vcfg
+        voice_status = {"provisioned": bool(vcfg.get("vapi_assistant_id")), "vapi_assistant_id": vcfg.get("vapi_assistant_id"), "enabled": vcfg["enabled"]}
+
+    # widget
+    try:
+        _, plain_key = await _ensure_widget(db, agent)
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("widget creation failed: %s", exc)
+        plain_key = ""
+
+    await db.commit()
+    await db.refresh(agent)
+
+    return {
+        "success": True,
+        "plan": {"business_name": business_name, "industry": industry, "tools": tools, "lane": lane},
+        "agent": {
+            "id": str(agent.id), "agent_name": agent.agent_name, "slug": agent.slug,
+            "lane": lane, "status": agent.status,
+        },
+        "preview_url": f"{APP_URL}/chat?agent_name={agent.slug}",
+        "voice": voice_status,
+        "embed": _embed_snippet(agent.slug, agent.id, plain_key) if plain_key else None,
+    }
+
