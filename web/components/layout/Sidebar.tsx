@@ -45,6 +45,15 @@ const navigation: NavEntry[] = [
     )
   },
   {
+    name: 'Voice',
+    href: '/voice',
+    icon: (
+      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M19 11a7 7 0 01-14 0M12 18v3m-4 0h8M12 3a3 3 0 013 3v5a3 3 0 01-6 0V6a3 3 0 013-3z" />
+      </svg>
+    ),
+  },
+  {
     name: 'Browse Agents',
     href: '/browse',
     icon: (

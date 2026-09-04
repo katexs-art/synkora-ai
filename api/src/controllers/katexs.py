@@ -503,3 +503,80 @@ async def describe_build(
         "embed": _embed_snippet(agent.slug, agent.id, plain_key) if plain_key else None,
     }
 
+
+@router.get("/voice-overview")
+async def voice_overview(
+    tenant_id: uuid.UUID = Depends(get_current_tenant_id),
+    db: AsyncSession = Depends(get_async_db),
+):
+    """Voice section data: voice agents, phone numbers, recent calls."""
+    from src.models.phone_call import PhoneCall
+    from src.models.phone_number import PhoneNumber
+
+    # voice agents (voice_enabled or phone_config set)
+    agents_res = await db.execute(
+        select(Agent).filter(Agent.tenant_id == tenant_id).order_by(Agent.created_at.desc()).limit(50)
+    )
+    agents = []
+    for a in agents_res.scalars():
+        pc = a.phone_config or {}
+        is_voice = bool(a.voice_enabled) or pc.get("provider") == "vapi" or (a.agent_metadata or {}).get("katexs_lane") == "voice"
+        if not is_voice:
+            continue
+        agents.append({
+            "id": str(a.id),
+            "agent_name": a.agent_name,
+            "slug": a.slug,
+            "status": a.status,
+            "greeting": pc.get("greeting") or "",
+            "enabled": bool(pc.get("enabled")),
+            "vapi_assistant_id": pc.get("vapi_assistant_id") or "",
+            "phone_provisioned": bool(pc.get("vapi_assistant_id")),
+            "updated_at": a.updated_at.isoformat() if a.updated_at else None,
+        })
+
+    numbers_res = await db.execute(
+        select(PhoneNumber).filter(PhoneNumber.tenant_id == tenant_id).order_by(PhoneNumber.created_at.desc()).limit(20)
+    )
+    numbers = [
+        {
+            "id": str(n.id),
+            "phone_number": n.phone_number,
+            "agent_id": str(n.agent_id) if n.agent_id else None,
+            "provider": n.provider,
+            "is_active": n.is_active,
+        }
+        for n in numbers_res.scalars()
+    ]
+
+    calls_res = await db.execute(
+        select(PhoneCall)
+        .filter(PhoneCall.tenant_id == tenant_id)
+        .order_by(PhoneCall.started_at.desc())
+        .limit(15)
+    )
+    calls = []
+    for c in calls_res.scalars():
+        agent_name = ""
+        if c.agent_id:
+            ares = await db.execute(select(Agent).filter(Agent.id == c.agent_id))
+            aa = ares.scalar_one_or_none()
+            if aa:
+                agent_name = aa.agent_name
+        calls.append({
+            "id": str(c.id),
+            "caller_number": c.caller_number or "",
+            "agent_name": agent_name,
+            "status": c.status.value if hasattr(c.status, "value") else str(c.status),
+            "duration_seconds": c.duration_seconds,
+            "started_at": c.started_at.isoformat() if c.started_at else None,
+            "recording_url": c.recording_url or "",
+        })
+
+    return {
+        "success": True,
+        "agents": agents,
+        "numbers": numbers,
+        "calls": calls,
+    }
+
