@@ -4,7 +4,7 @@ import { apiClient } from './http'
 // Apps
 export async function getApps(): Promise<App[]> {
   const { data } = await apiClient.axios.get('/api/v1/apps')
-  // Synkora returns: { page, limit, total, has_more, data: [...] }
+  // Katexs returns: { page, limit, total, has_more, data: [...] }
   return data.data || []
 }
 

@@ -152,7 +152,7 @@ export default async function OpenGraphImage({
                   S
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                  <div style={{ fontSize: 18, fontWeight: 700 }}>Synkora</div>
+                  <div style={{ fontSize: 18, fontWeight: 700 }}>Katexs</div>
                   <div style={{ fontSize: 11, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.78)' }}>
                     Mindset Scorecard
                   </div>
@@ -262,7 +262,7 @@ export default async function OpenGraphImage({
                     color: 'rgba(255,255,255,0.40)',
                   }}
                 >
-                  Synkora AI
+                  Katexs AI
                 </div>
               </div>
 
@@ -385,7 +385,7 @@ export default async function OpenGraphImage({
                     color: 'rgba(255,255,255,0.34)',
                   }}
                 >
-                  Synkora AI
+                  Katexs AI
                 </div>
               </div>
             </div>

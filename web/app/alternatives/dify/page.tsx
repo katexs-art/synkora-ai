@@ -3,25 +3,25 @@ import { Check, X, Minus } from 'lucide-react'
 import PublicPageFrame from '@/components/public/PublicPageFrame'
 
 export const metadata = {
-  title: 'Synkora vs Dify',
-  description: 'Synkora vs Dify: a detailed comparison of two open-source LLM application platforms. API-first design, multi-channel deployment, MCP, HITL, and more.',
+  title: 'Katexs vs Dify',
+  description: 'Katexs vs Dify: a detailed comparison of two open-source LLM application platforms. API-first design, multi-channel deployment, MCP, HITL, and more.',
 }
 
 const features = [
-  { name: 'Open source', synkora: 'yes', dify: 'yes' },
-  { name: 'Self-hostable', synkora: 'yes', dify: 'yes' },
-  { name: 'Multi-tenant', synkora: 'yes', dify: 'yes' },
-  { name: 'RAG / knowledge bases', synkora: 'yes', dify: 'yes' },
-  { name: 'Multi-provider LLM routing', synkora: 'yes', dify: 'yes' },
-  { name: 'Visual workflow DAG editor', synkora: 'partial', dify: 'yes' },
-  { name: 'SSE / WebSocket streaming', synkora: 'yes', dify: 'partial' },
-  { name: 'Slack / WhatsApp / Teams / Telegram', synkora: 'yes', dify: 'no' },
-  { name: 'MCP server support', synkora: 'yes', dify: 'no' },
-  { name: 'HITL approval gates', synkora: 'yes', dify: 'no' },
-  { name: 'Sub-agents', synkora: 'yes', dify: 'partial' },
-  { name: 'Agent API keys', synkora: 'yes', dify: 'no' },
-  { name: 'Scheduled tasks', synkora: 'yes', dify: 'no' },
-  { name: 'Built-in billing / credits', synkora: 'yes', dify: 'partial' },
+  { name: 'Open source', katexs: 'yes', dify: 'yes' },
+  { name: 'Self-hostable', katexs: 'yes', dify: 'yes' },
+  { name: 'Multi-tenant', katexs: 'yes', dify: 'yes' },
+  { name: 'RAG / knowledge bases', katexs: 'yes', dify: 'yes' },
+  { name: 'Multi-provider LLM routing', katexs: 'yes', dify: 'yes' },
+  { name: 'Visual workflow DAG editor', katexs: 'partial', dify: 'yes' },
+  { name: 'SSE / WebSocket streaming', katexs: 'yes', dify: 'partial' },
+  { name: 'Slack / WhatsApp / Teams / Telegram', katexs: 'yes', dify: 'no' },
+  { name: 'MCP server support', katexs: 'yes', dify: 'no' },
+  { name: 'HITL approval gates', katexs: 'yes', dify: 'no' },
+  { name: 'Sub-agents', katexs: 'yes', dify: 'partial' },
+  { name: 'Agent API keys', katexs: 'yes', dify: 'no' },
+  { name: 'Scheduled tasks', katexs: 'yes', dify: 'no' },
+  { name: 'Built-in billing / credits', katexs: 'yes', dify: 'partial' },
 ]
 
 function Cell({ value }: { value: 'yes' | 'no' | 'partial' }) {
@@ -34,9 +34,9 @@ const breadcrumbLd = {
   '@context': 'https://schema.org',
   '@type': 'BreadcrumbList',
   itemListElement: [
-    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://synkora.ai' },
-    { '@type': 'ListItem', position: 2, name: 'Alternatives', item: 'https://synkora.ai/alternatives' },
-    { '@type': 'ListItem', position: 3, name: 'Synkora vs Dify', item: 'https://synkora.ai/alternatives/dify' },
+    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://katexs.ai' },
+    { '@type': 'ListItem', position: 2, name: 'Alternatives', item: 'https://katexs.ai/alternatives' },
+    { '@type': 'ListItem', position: 3, name: 'Katexs vs Dify', item: 'https://katexs.ai/alternatives/dify' },
   ],
 }
 
@@ -55,9 +55,9 @@ export default function DifyComparisonPage() {
         </div>
 
         {/* Hero */}
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">Synkora vs Dify</h1>
+        <h1 className="text-4xl font-bold text-gray-900 mb-4">Katexs vs Dify</h1>
         <p className="text-xl text-gray-600 mb-12 max-w-3xl">
-          Both are open-source, self-hostable LLM application platforms with RAG and multi-tenancy. Synkora focuses on API-first design, multi-channel deployment, and production infrastructure features. Dify has a more mature visual workflow DAG editor and a larger community.
+          Both are open-source, self-hostable LLM application platforms with RAG and multi-tenancy. Katexs focuses on API-first design, multi-channel deployment, and production infrastructure features. Dify has a more mature visual workflow DAG editor and a larger community.
         </p>
 
         {/* What is Dify */}
@@ -69,9 +69,9 @@ export default function DifyComparisonPage() {
             </p>
           </div>
           <div className="bg-red-50 rounded-xl p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-3">What is Synkora?</h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-3">What is Katexs?</h2>
             <p className="text-gray-600 text-sm leading-relaxed">
-              Synkora is an API-first, multitenant LLM application platform for building and deploying AI agents across multiple channels. It prioritizes production infrastructure: SSE/WebSocket streaming, multi-channel bots (Slack, WhatsApp, Teams, Telegram), MCP server support, HITL approval gates, and per-agent billing.
+              Katexs is an API-first, multitenant LLM application platform for building and deploying AI agents across multiple channels. It prioritizes production infrastructure: SSE/WebSocket streaming, multi-channel bots (Slack, WhatsApp, Teams, Telegram), MCP server support, HITL approval gates, and per-agent billing.
             </p>
           </div>
         </div>
@@ -83,7 +83,7 @@ export default function DifyComparisonPage() {
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
                 <th className="text-left px-5 py-3 font-semibold text-gray-700">Feature</th>
-                <th className="text-center px-5 py-3 font-semibold text-red-600">Synkora</th>
+                <th className="text-center px-5 py-3 font-semibold text-red-600">Katexs</th>
                 <th className="text-center px-5 py-3 font-semibold text-gray-700">Dify</th>
               </tr>
             </thead>
@@ -91,7 +91,7 @@ export default function DifyComparisonPage() {
               {features.map((row, i) => (
                 <tr key={row.name} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}>
                   <td className="px-5 py-3 text-gray-700">{row.name}</td>
-                  <td className="px-5 py-3 text-center"><Cell value={row.synkora as 'yes' | 'no' | 'partial'} /></td>
+                  <td className="px-5 py-3 text-center"><Cell value={row.katexs as 'yes' | 'no' | 'partial'} /></td>
                   <td className="px-5 py-3 text-center"><Cell value={row.dify as 'yes' | 'no' | 'partial'} /></td>
                 </tr>
               ))}
@@ -105,7 +105,7 @@ export default function DifyComparisonPage() {
         {/* When to choose */}
         <div className="grid md:grid-cols-2 gap-8 mb-16">
           <div className="border border-red-200 rounded-xl p-6">
-            <h2 className="text-lg font-semibold text-red-700 mb-4">When to choose Synkora</h2>
+            <h2 className="text-lg font-semibold text-red-700 mb-4">When to choose Katexs</h2>
             <ul className="space-y-2 text-sm text-gray-700">
               <li className="flex gap-2"><Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />You need multi-channel deployment (Slack, WhatsApp, Teams, Telegram)</li>
               <li className="flex gap-2"><Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />You need MCP server integrations</li>
@@ -128,8 +128,8 @@ export default function DifyComparisonPage() {
 
         {/* CTA */}
         <div className="bg-gradient-to-r from-red-500 to-rose-600 rounded-2xl p-8 text-center text-white">
-          <h2 className="text-2xl font-bold mb-2">Try Synkora free</h2>
-          <p className="text-white/90 mb-6">Self-host in minutes or use Synkora Cloud. MIT licensed.</p>
+          <h2 className="text-2xl font-bold mb-2">Try Katexs free</h2>
+          <p className="text-white/90 mb-6">Self-host in minutes or use Katexs Cloud. MIT licensed.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link href="/signup" className="px-6 py-3 bg-white text-red-600 font-semibold rounded-xl hover:bg-gray-50 transition-colors">
               Get Started Free

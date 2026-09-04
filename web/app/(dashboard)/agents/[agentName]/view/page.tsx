@@ -1031,7 +1031,7 @@ export default function AgentViewPage() {
                     const Vapi = (await import('@vapi-ai/web')).default
                     const vapi = new Vapi(vapiPublicKey)
                     // The assistant is registered with our webhook as its model URL,
-                    // so all conversation turns route through the full Synkora agent pipeline.
+                    // so all conversation turns route through the full Katexs agent pipeline.
                     vapi.start(token.vapi_assistant_id)
                     vapi.on('call-end', () => { setCallActive(false); setVapiInstance(null) })
                     setVapiInstance(vapi)

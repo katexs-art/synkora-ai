@@ -64,14 +64,14 @@ export default function ContactPage() {
                 </span>
               </h1>
               <p className="text-lg text-gray-600 mb-8 leading-relaxed">
-                Have questions about Synkora? Want to discuss enterprise licensing?
+                Have questions about Katexs? Want to discuss enterprise licensing?
                 Or just want to say hello? We're here to help.
               </p>
 
               {/* Contact Methods */}
               <div className="space-y-6">
                 <a
-                  href="mailto:hello@synkora.ai"
+                  href="mailto:hello@katexs.ai"
                   className="flex items-start gap-4 p-4 bg-white rounded-xl border border-gray-100 hover:border-red-200 hover:shadow-md transition-all group"
                 >
                   <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:bg-red-200 transition-colors">
@@ -79,13 +79,13 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-900 mb-1">Email Us</h3>
-                    <p className="text-red-600 font-medium">hello@synkora.ai</p>
+                    <p className="text-red-600 font-medium">hello@katexs.ai</p>
                     <p className="text-sm text-gray-500 mt-1">We typically respond within 24 hours</p>
                   </div>
                 </a>
 
                 <a
-                  href="https://github.com/rajuniit/synkora-ai/issues"
+                  href="https://github.com/rajuniit/katexs-ai/issues"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-start gap-4 p-4 bg-white rounded-xl border border-gray-100 hover:border-gray-300 hover:shadow-md transition-all group"
@@ -101,7 +101,7 @@ export default function ContactPage() {
                 </a>
 
                 <a
-                  href="https://discord.gg/synkora-ai"
+                  href="https://discord.gg/katexs-ai"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-start gap-4 p-4 bg-white rounded-xl border border-gray-100 hover:border-indigo-200 hover:shadow-md transition-all group"
@@ -125,15 +125,15 @@ export default function ContactPage() {
                 <ul className="space-y-2 text-sm">
                   <li>
                     <span className="text-gray-500">Enterprise Licensing:</span>{' '}
-                    <a href="mailto:licensing@synkora.ai" className="text-red-600 hover:underline">licensing@synkora.ai</a>
+                    <a href="mailto:licensing@katexs.ai" className="text-red-600 hover:underline">licensing@katexs.ai</a>
                   </li>
                   <li>
                     <span className="text-gray-500">Security Issues:</span>{' '}
-                    <a href="mailto:security@synkora.ai" className="text-red-600 hover:underline">security@synkora.ai</a>
+                    <a href="mailto:security@katexs.ai" className="text-red-600 hover:underline">security@katexs.ai</a>
                   </li>
                   <li>
                     <span className="text-gray-500">Support:</span>{' '}
-                    <a href="mailto:support@synkora.ai" className="text-red-600 hover:underline">support@synkora.ai</a>
+                    <a href="mailto:support@katexs.ai" className="text-red-600 hover:underline">support@katexs.ai</a>
                   </li>
                 </ul>
               </div>

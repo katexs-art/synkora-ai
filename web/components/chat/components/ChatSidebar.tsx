@@ -86,7 +86,7 @@ export function ChatSidebar({
 
   return (
     <div className={cn('flex flex-col h-full', className)}>
-      {/* Header - Synkora Logo & Tenant Name */}
+      {/* Header - Katexs Logo & Tenant Name */}
       <div className="p-4 border-b border-gray-100">
         <a
           href="/agents"
@@ -95,7 +95,7 @@ export function ChatSidebar({
           {tenantLogo ? (
             <img
               src={tenantLogo}
-              alt={tenantName || 'Synkora'}
+              alt={tenantName || 'Katexs'}
               className="w-8 h-8 rounded-lg object-contain flex-shrink-0"
             />
           ) : (
@@ -106,7 +106,7 @@ export function ChatSidebar({
             </div>
           )}
           <span className="font-bold text-gray-900 truncate">
-            {tenantName || 'Synkora'}
+            {tenantName || 'Katexs'}
           </span>
         </a>
       </div>

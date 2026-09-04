@@ -92,7 +92,7 @@ export default function AgentPortalSettingsPage() {
         <div className="mb-4">
           <h3 className="text-sm font-semibold text-gray-900 mb-0.5">Portal Visibility</h3>
           <p className="text-xs text-gray-500">
-            This is independent of the Synkora marketplace visibility (<code>is_public</code>).
+            This is independent of the Katexs marketplace visibility (<code>is_public</code>).
           </p>
         </div>
 

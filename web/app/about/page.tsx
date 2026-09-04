@@ -3,8 +3,8 @@ import { Zap, Target, Sparkles, Code, Globe, Heart, ArrowRight, Database, Layers
 import PublicPageFrame from '@/components/public/PublicPageFrame'
 
 export const metadata = {
-  title: 'About – Synkora',
-  description: 'Synkora is an open-source AI and LLM platform for building, deploying, and operating agents, workflows, and model-powered products with API-first infrastructure.',
+  title: 'About – Katexs',
+  description: 'Katexs is an open-source AI and LLM platform for building, deploying, and operating agents, workflows, and model-powered products with API-first infrastructure.',
 }
 
 const platformPillars = [
@@ -72,7 +72,7 @@ export default function AboutPage() {
         <div className="relative max-w-5xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/65 px-4 py-2 text-sm font-semibold uppercase tracking-[0.18em] text-[#4b463e] shadow-[0_12px_28px_rgba(0,0,0,0.04)] backdrop-blur mb-6">
             <Heart className="w-4 h-4" />
-            About Synkora
+            About Katexs
           </div>
           <h1 className="text-4xl sm:text-6xl font-medium tracking-[-0.06em] text-[#171717]">
             The Open-Source
@@ -81,7 +81,7 @@ export default function AboutPage() {
             </span>
           </h1>
           <p className="mt-6 max-w-3xl mx-auto text-base sm:text-xl leading-8 text-[#5a544a]">
-            Synkora is the platform layer for building, deploying, and operating AI agents, LLM workflows, and model-powered products - with your own providers, your own data, and infrastructure you control.
+            Katexs is the platform layer for building, deploying, and operating AI agents, LLM workflows, and model-powered products - with your own providers, your own data, and infrastructure you control.
           </p>
 
           <div className="mt-12 grid gap-4 sm:grid-cols-3 text-left">
@@ -121,7 +121,7 @@ export default function AboutPage() {
                 Most teams do not need another framework demo. They need a real platform that can manage agents, LLM providers, knowledge, tools, tenants, billing, and deployment channels without stitching everything together from scratch.
               </p>
               <p className="text-lg text-[#5f594f] leading-8">
-                Synkora exists to give teams that platform: an open-source foundation for AI products and LLM applications that can move from prototype to production without switching stacks halfway through.
+                Katexs exists to give teams that platform: an open-source foundation for AI products and LLM applications that can move from prototype to production without switching stacks halfway through.
               </p>
             </div>
 
@@ -154,7 +154,7 @@ export default function AboutPage() {
               Built around platforms, not just prompts
             </h2>
             <p className="mx-auto max-w-2xl text-base sm:text-xl text-[#5d564c] leading-8">
-              Synkora is designed for teams that need a durable foundation for AI products, not a collection of disconnected experiments.
+              Katexs is designed for teams that need a durable foundation for AI products, not a collection of disconnected experiments.
             </p>
           </div>
 
@@ -187,7 +187,7 @@ export default function AboutPage() {
             Built by Raju Mazumder
           </h2>
           <p className="text-lg text-[#cfc7bb] mb-6 leading-8">
-            Synkora was created by <strong className="text-white">Raju Mazumder</strong> to solve a platform problem: teams wanted to ship AI products and LLM-powered systems, but the infrastructure story was fragmented, repetitive, and too easy to outgrow.
+            Katexs was created by <strong className="text-white">Raju Mazumder</strong> to solve a platform problem: teams wanted to ship AI products and LLM-powered systems, but the infrastructure story was fragmented, repetitive, and too easy to outgrow.
           </p>
           <p className="text-lg text-[#cfc7bb] mb-8 leading-8">
             The result is an open-source platform focused on operational reality - APIs, multi-tenancy, agents, knowledge, integrations, deployment surfaces, and the controls needed to run AI seriously.
@@ -210,7 +210,7 @@ export default function AboutPage() {
             <div className="absolute inset-[10px] rounded-[2.2rem] border border-white/8" />
             <div className="relative">
               <h2 className="text-3xl font-medium tracking-[-0.05em] text-white mb-4">
-                Ready to build on Synkora?
+                Ready to build on Katexs?
               </h2>
               <p className="text-lg text-white/85 mb-8 max-w-xl mx-auto leading-8">
                 Start with the platform foundation now, then scale into agents, knowledge, integrations, and deployment channels without switching stacks.
@@ -224,7 +224,7 @@ export default function AboutPage() {
                   Get Started Free
                 </Link>
                 <Link
-                  href="https://github.com/rajuniit/synkora-ai"
+                  href="https://github.com/rajuniit/katexs-ai"
                   target="_blank"
                   className="inline-flex items-center gap-2 rounded-full border border-white/16 bg-white/6 px-8 py-4 font-semibold text-white transition-colors hover:bg-white/10"
                 >

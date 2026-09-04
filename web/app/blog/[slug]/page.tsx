@@ -28,12 +28,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   if (!post) {
     return {
-      title: 'Blog – Synkora',
+      title: 'Blog – Katexs',
     }
   }
 
   return {
-    title: `${post.title} – Synkora`,
+    title: `${post.title} – Katexs`,
     description: post.excerpt,
   }
 }

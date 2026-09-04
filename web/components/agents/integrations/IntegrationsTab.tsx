@@ -280,7 +280,7 @@ print(result["artifacts"][0]["parts"][0]["text"])`
             checked={cfg.a2a_enabled}
             onChange={(v) => setConfig({ ...cfg, a2a_enabled: v })}
             label="Enable A2A Protocol"
-            description="Allow other agents (LangGraph, AutoGen, remote Synkora) to call this agent"
+            description="Allow other agents (LangGraph, AutoGen, remote Katexs) to call this agent"
           />
 
           {cfg.a2a_enabled && (

@@ -618,7 +618,7 @@ export const ChatMessage = memo(function ChatMessage({
                       height: '100%',
                       backgroundColor: '#ff444f',
                       boxShadow: '0 0 5px #ff444faa',
-                      animation: `synkora-bar 0.75s ease-in-out ${delay}ms infinite`,
+                      animation: `katexs-bar 0.75s ease-in-out ${delay}ms infinite`,
                     }}
                   />
                 ))}
@@ -808,7 +808,7 @@ export const ChatMessage = memo(function ChatMessage({
                     height: '100%',
                     backgroundColor: '#ff444f',
                     boxShadow: '0 0 5px #ff444faa',
-                    animation: `synkora-bar 0.75s ease-in-out ${delay}ms infinite`,
+                    animation: `katexs-bar 0.75s ease-in-out ${delay}ms infinite`,
                   }}
                 />
               ))}

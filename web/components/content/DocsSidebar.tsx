@@ -17,7 +17,7 @@ export default function DocsSidebar({
           Documentation
         </p>
         <h2 className="mt-2 text-lg font-semibold tracking-[-0.03em] text-[#171717]">
-          Synkora Docs
+          Katexs Docs
         </h2>
       </div>
 

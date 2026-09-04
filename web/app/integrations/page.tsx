@@ -20,9 +20,9 @@ import {
 } from 'lucide-react'
 import PublicPageFrame from '@/components/public/PublicPageFrame'
 
-const GITHUB_REPO_URL = 'https://github.com/getsynkora/synkora-ai'
+const GITHUB_REPO_URL = 'https://github.com/getkatexs/katexs-ai'
 const CHROME_EXTENSION_URL = process.env.NEXT_PUBLIC_CHROME_EXTENSION_URL || `${GITHUB_REPO_URL}/tree/master/extension`
-const FLUTTER_PUB_URL = process.env.NEXT_PUBLIC_FLUTTER_PUB_URL || 'https://pub.dev/packages/synkora_chat'
+const FLUTTER_PUB_URL = process.env.NEXT_PUBLIC_FLUTTER_PUB_URL || 'https://pub.dev/packages/katexs_chat'
 
 const widgetFeatures = [
   'One script tag — works on any website or web app',
@@ -30,7 +30,7 @@ const widgetFeatures = [
   'Mobile-responsive bubble and chat window',
   'Supports file uploads, rich text, and streaming',
   'Conversation history persisted across sessions',
-  'White-label: hide all Synkora branding if needed',
+  'White-label: hide all Katexs branding if needed',
 ]
 
 const chromeFeatures = [
@@ -52,7 +52,7 @@ const flutterFeatures = [
 ]
 
 const widgetSnippet = `<script>
-  window.SynkoraConfig = {
+  window.KatexsConfig = {
     agentSlug: 'your-agent',
     primaryColor: '#ef4444',
     position: 'bottom-right',
@@ -61,12 +61,12 @@ const widgetSnippet = `<script>
 <script src="https://your-instance.com/widget.js"></script>`
 
 const flutterSnippet = `dependencies:
-  synkora_flutter: ^1.0.0`
+  katexs_flutter: ^1.0.0`
 
-const flutterUsageSnippet = `SynkoraChat(
+const flutterUsageSnippet = `KatexsChat(
   agentSlug: 'your-agent',
   apiUrl: 'https://your-instance.com',
-  theme: SynkoraChatTheme(
+  theme: KatexsChatTheme(
     primaryColor: Color(0xFFEF4444),
   ),
 )`
@@ -295,7 +295,7 @@ export default function IntegrationsPage() {
                         <div className="w-6 h-6 bg-[#191919] rounded-lg flex items-center justify-center">
                           <Zap className="w-3 h-3 text-white" />
                         </div>
-                        <span className="text-sm font-bold text-gray-900">Synkora</span>
+                        <span className="text-sm font-bold text-gray-900">Katexs</span>
                       </div>
                       <div className="bg-gray-50 rounded-lg p-3 mb-3 text-xs text-gray-500 italic">"Summarize the selected text..."</div>
                       <div className="bg-blue-50 border border-blue-100 rounded-lg p-3 text-xs text-gray-700 leading-relaxed">
@@ -362,7 +362,7 @@ export default function IntegrationsPage() {
                         <h3 className="text-2xl font-semibold tracking-[-0.03em] text-[#171717]">Flutter Package</h3>
                         <span className="px-2 py-0.5 bg-[#e4f2ef] text-[#2d8b69] text-xs font-semibold rounded-full">Available now</span>
                       </div>
-                      <p className="text-sm text-[#7a736a]">Official Dart/Flutter SDK for Synkora</p>
+                      <p className="text-sm text-[#7a736a]">Official Dart/Flutter SDK for Katexs</p>
                     </div>
                   </div>
                   <p className="text-[#5f594f] mb-8 leading-8">

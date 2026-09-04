@@ -77,7 +77,7 @@ export function ShareModal({ conversationId, messages = [], conversationName, ag
       const blob = await response.blob()
       const blobUrl = URL.createObjectURL(blob)
       const anchor = document.createElement('a')
-      const baseName = slugify(agentName || conversationName || 'synkora-share-image')
+      const baseName = slugify(agentName || conversationName || 'katexs-share-image')
       anchor.href = blobUrl
       anchor.download = `${baseName}.png`
       document.body.appendChild(anchor)
@@ -138,7 +138,7 @@ export function ShareModal({ conversationId, messages = [], conversationName, ag
               {generatedImageUrl ? (
                 <img
                   src={generatedImageUrl}
-                  alt="Generated Synkora share card"
+                  alt="Generated Katexs share card"
                   className="w-full rounded-[22px] border border-white/10 bg-black/20 shadow-[0_24px_80px_rgba(4,8,20,0.45)]"
                 />
               ) : (
@@ -151,7 +151,7 @@ export function ShareModal({ conversationId, messages = [], conversationName, ag
                       Generate a polished social card
                     </h3>
                     <p className="mt-2 text-sm leading-6 text-white/[0.65]">
-                      Create a modern Synkora-branded PNG you can upload directly to LinkedIn, X, or anywhere else.
+                      Create a modern Katexs-branded PNG you can upload directly to LinkedIn, X, or anywhere else.
                     </p>
                   </div>
                 </div>

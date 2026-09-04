@@ -728,7 +728,7 @@ export function AnimatedLanding({ data, slug }: { data: LandingData; slug: strin
             <Link href="/signin" className="transition-colors hover:text-white">Sign in</Link>
             <Link href="/signup" className="transition-colors hover:text-white">Sign up</Link>
           </div>
-          <span>Powered by Synkora</span>
+          <span>Powered by Katexs</span>
         </div>
       </footer>
     </div>

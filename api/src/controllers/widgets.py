@@ -288,8 +288,8 @@ async def get_widget_config(http_request: Request, db: AsyncSession = Depends(ge
                 "privacy_policy_url": theme.get("privacy_policy_url") or "",
                 "privacy_policy_text": theme.get("privacy_policy_text") or "",
                 # branding_text can be a string or False to hide the bar entirely
-                "branding_text": theme.get("branding_text"),
-                "branding_url": theme.get("branding_url") or "",
+                "branding_text": theme.get("branding_text") or "Powered by Katexs",
+                "branding_url": theme.get("branding_url") or "https://katexs.com",
             },
             "pre_chat_form": {
                 "enabled": bool(pre_chat.get("enabled", False)),
@@ -1023,15 +1023,16 @@ async def get_embed_code(
         except Exception:
             display_api_key = widget.api_key  # already plain (legacy)
 
-        embed_code = f"""<!-- Synkora Agent Widget -->
-<div id="synkora-widget-{widget_id}"></div>
+        embed_code = f"""<!-- Katexs AI Chat Widget -->
+<div id="katexs-widget-{widget_id}"></div>
 <script src="{widget_js_url}"></script>
 <script>
   SynkoraWidget.init({{
     widgetId: '{widget_id}',
     apiKey: '{display_api_key}',
-    containerId: 'synkora-widget-{widget_id}',
-    apiUrl: '{public_api_url}'
+    containerId: 'katexs-widget-{widget_id}',
+    apiUrl: '{public_api_url}',
+    brandingText: 'Powered by Katexs'
   }});
 </script>"""
 

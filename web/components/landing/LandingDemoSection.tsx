@@ -203,7 +203,7 @@ export default function LandingDemoSection() {
             Product Demo
           </div>
           <h2 className="demo-title mb-4 text-4xl font-medium tracking-[-0.05em] text-[#171717] sm:text-5xl">
-            See Synkora in action
+            See Katexs in action
           </h2>
           <p className="demo-copy mx-auto max-w-xl text-lg leading-relaxed text-[#565149]">
             Build production-ready AI agents - from the web UI or directly via API
@@ -236,7 +236,7 @@ export default function LandingDemoSection() {
                   <svg className="h-3 w-3 shrink-0 text-[#7a736a]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                   </svg>
-                  <span className="truncate font-mono text-xs text-[#7a736a]">app.synkora.ai</span>
+                  <span className="truncate font-mono text-xs text-[#7a736a]">app.katexs.ai</span>
                 </div>
               </div>
             </div>
@@ -290,7 +290,7 @@ export default function LandingDemoSection() {
 
         <div className="mt-10 text-center">
           <Link
-            href="https://app.synkora.ai/signup"
+            href="https://app.katexs.ai/signup"
             className="demo-cta inline-flex items-center gap-2 rounded-full bg-[#191919] px-7 py-3 text-sm font-semibold uppercase tracking-[0.16em] text-[#f7f2e7] shadow-[0_18px_40px_rgba(23,23,23,0.18)] transition-transform hover:-translate-y-0.5"
           >
             <Zap className="h-4 w-4" />

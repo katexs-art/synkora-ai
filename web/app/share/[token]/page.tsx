@@ -14,7 +14,7 @@ function buildMetadataDescription(data: any) {
   const mindsetShare = extractMindsetShareData(data)
   if (mindsetShare) return mindsetShare.shareCaption
   if (data?.agent?.description) return data.agent.description
-  return 'A shared Synkora conversation.'
+  return 'A shared Katexs conversation.'
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -27,8 +27,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const data = await getSharedConversation(token)
     const mindsetShare = extractMindsetShareData(data)
     const title = mindsetShare
-      ? `${mindsetShare.headline} | Synkora Mindset Snapshot`
-      : `${data?.conversation?.name || 'Shared Conversation'} | Synkora`
+      ? `${mindsetShare.headline} | Katexs Mindset Snapshot`
+      : `${data?.conversation?.name || 'Shared Conversation'} | Katexs`
     const description = buildMetadataDescription(data)
     const ogImage = `${API_URL}/api/v1/public/share/${encodeURIComponent(token)}/image`
 
@@ -40,7 +40,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         title,
         description,
         type: 'article',
-        siteName: 'Synkora',
+        siteName: 'Katexs',
         images: [{ url: ogImage, width: 1200, height: 630, alt: title }],
       },
       twitter: {
@@ -52,8 +52,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     }
   } catch {
     return {
-      title: 'Shared Conversation | Synkora',
-      description: 'A shared Synkora conversation.',
+      title: 'Shared Conversation | Katexs',
+      description: 'A shared Katexs conversation.',
     }
   }
 }

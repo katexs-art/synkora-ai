@@ -151,14 +151,14 @@ export default function CTASectionClient() {
               </p>
               <div className="cta-actions flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Link
-                  href="https://app.synkora.ai/signup"
+                  href="https://app.katexs.ai/signup"
                   className="inline-flex items-center gap-2 rounded-full bg-[#7de5c1] px-8 py-4 font-semibold text-[#101915] transition-transform hover:-translate-y-0.5"
                 >
                   <Zap className="w-5 h-5" />
                   Get Started Free
                 </Link>
                 <a
-                  href="https://github.com/getsynkora/synkora-ai"
+                  href="https://github.com/getkatexs/katexs-ai"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-8 py-4 font-semibold text-white transition-colors hover:bg-white/10"

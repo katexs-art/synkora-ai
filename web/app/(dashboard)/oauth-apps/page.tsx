@@ -688,7 +688,7 @@ export default function OAuthAppsPage() {
                 <div className="flex items-center gap-2">
                   <Shield className="w-4 h-4 text-[#7c5d45]" />
                   <h2 className="text-xs font-semibold text-[#7c5d45] uppercase tracking-[0.12em]">Platform Integrations</h2>
-                  <span className="text-xs text-gray-400 font-normal normal-case">— credentials managed by Synkora</span>
+                  <span className="text-xs text-gray-400 font-normal normal-case">— credentials managed by Katexs</span>
                 </div>
                 {loadingPlatformApps ? (
                   <div className="text-sm text-[#7c5d45] py-2">Loading platform apps...</div>

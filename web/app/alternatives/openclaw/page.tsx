@@ -3,25 +3,25 @@ import { Check, X, Minus } from 'lucide-react'
 import PublicPageFrame from '@/components/public/PublicPageFrame'
 
 export const metadata = {
-  title: 'Synkora vs OpenClaw',
-  description: 'Synkora vs OpenClaw: team AI platform vs personal AI assistant. Different tools for fundamentally different use cases.',
+  title: 'Katexs vs OpenClaw',
+  description: 'Katexs vs OpenClaw: team AI platform vs personal AI assistant. Different tools for fundamentally different use cases.',
 }
 
 const features = [
-  { name: 'Multi-tenant / team access', synkora: 'yes', openclaw: 'no' },
-  { name: 'API-first for product integration', synkora: 'yes', openclaw: 'no' },
-  { name: 'RAG / knowledge bases', synkora: 'yes', openclaw: 'no' },
-  { name: 'Multi-channel deployment (web widget, API)', synkora: 'yes', openclaw: 'no' },
-  { name: 'Built-in billing / credits', synkora: 'yes', openclaw: 'no' },
-  { name: 'Scheduled autonomous tasks', synkora: 'yes', openclaw: 'no' },
-  { name: 'HITL approval gates', synkora: 'yes', openclaw: 'no' },
-  { name: 'Local model support', synkora: 'partial', openclaw: 'yes' },
-  { name: 'Voice interface', synkora: 'no', openclaw: 'yes' },
-  { name: 'iMessage / Signal integration', synkora: 'no', openclaw: 'yes' },
-  { name: 'Browser control', synkora: 'no', openclaw: 'yes' },
-  { name: 'Shell execution (local)', synkora: 'no', openclaw: 'yes' },
-  { name: 'Single-user personal assistant', synkora: 'no', openclaw: 'yes' },
-  { name: 'Mac / Windows / Linux daemon', synkora: 'no', openclaw: 'yes' },
+  { name: 'Multi-tenant / team access', katexs: 'yes', openclaw: 'no' },
+  { name: 'API-first for product integration', katexs: 'yes', openclaw: 'no' },
+  { name: 'RAG / knowledge bases', katexs: 'yes', openclaw: 'no' },
+  { name: 'Multi-channel deployment (web widget, API)', katexs: 'yes', openclaw: 'no' },
+  { name: 'Built-in billing / credits', katexs: 'yes', openclaw: 'no' },
+  { name: 'Scheduled autonomous tasks', katexs: 'yes', openclaw: 'no' },
+  { name: 'HITL approval gates', katexs: 'yes', openclaw: 'no' },
+  { name: 'Local model support', katexs: 'partial', openclaw: 'yes' },
+  { name: 'Voice interface', katexs: 'no', openclaw: 'yes' },
+  { name: 'iMessage / Signal integration', katexs: 'no', openclaw: 'yes' },
+  { name: 'Browser control', katexs: 'no', openclaw: 'yes' },
+  { name: 'Shell execution (local)', katexs: 'no', openclaw: 'yes' },
+  { name: 'Single-user personal assistant', katexs: 'no', openclaw: 'yes' },
+  { name: 'Mac / Windows / Linux daemon', katexs: 'no', openclaw: 'yes' },
 ]
 
 function Cell({ value }: { value: 'yes' | 'no' | 'partial' }) {
@@ -34,9 +34,9 @@ const breadcrumbLd = {
   '@context': 'https://schema.org',
   '@type': 'BreadcrumbList',
   itemListElement: [
-    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://synkora.ai' },
-    { '@type': 'ListItem', position: 2, name: 'Alternatives', item: 'https://synkora.ai/alternatives' },
-    { '@type': 'ListItem', position: 3, name: 'Synkora vs OpenClaw', item: 'https://synkora.ai/alternatives/openclaw' },
+    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://katexs.ai' },
+    { '@type': 'ListItem', position: 2, name: 'Alternatives', item: 'https://katexs.ai/alternatives' },
+    { '@type': 'ListItem', position: 3, name: 'Katexs vs OpenClaw', item: 'https://katexs.ai/alternatives/openclaw' },
   ],
 }
 
@@ -53,14 +53,14 @@ export default function OpenClawComparisonPage() {
           <span>OpenClaw</span>
         </div>
 
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">Synkora vs OpenClaw</h1>
+        <h1 className="text-4xl font-bold text-gray-900 mb-4">Katexs vs OpenClaw</h1>
         <p className="text-xl text-gray-600 mb-8 max-w-3xl">
-          Synkora and OpenClaw are not direct competitors — they solve fundamentally different problems. OpenClaw is a local-first personal AI assistant for individuals. Synkora is a platform for teams building and deploying AI products.
+          Katexs and OpenClaw are not direct competitors — they solve fundamentally different problems. OpenClaw is a local-first personal AI assistant for individuals. Katexs is a platform for teams building and deploying AI products.
         </p>
 
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-5 mb-12 max-w-3xl">
           <p className="text-amber-900 text-sm">
-            <strong>Honest framing:</strong> If you&apos;re looking for a personal AI assistant that runs on your Mac, handles your iMessages, and controls your browser — OpenClaw is the right tool. If you&apos;re building AI agents for a team, a product, or customers — Synkora is the right tool. These pages exist for search discoverability, not because we think one product is better than the other in every context.
+            <strong>Honest framing:</strong> If you&apos;re looking for a personal AI assistant that runs on your Mac, handles your iMessages, and controls your browser — OpenClaw is the right tool. If you&apos;re building AI agents for a team, a product, or customers — Katexs is the right tool. These pages exist for search discoverability, not because we think one product is better than the other in every context.
           </p>
         </div>
 
@@ -72,9 +72,9 @@ export default function OpenClawComparisonPage() {
             </p>
           </div>
           <div className="bg-red-50 rounded-xl p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-3">What is Synkora?</h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-3">What is Katexs?</h2>
             <p className="text-gray-600 text-sm leading-relaxed">
-              Synkora is a multitenant platform for teams and companies building AI products. It includes team management, API-first agent deployment, RAG knowledge bases, multi-channel delivery (Slack, WhatsApp, Teams, web widget), billing, scheduled tasks, and observability — designed for production workloads and product companies.
+              Katexs is a multitenant platform for teams and companies building AI products. It includes team management, API-first agent deployment, RAG knowledge bases, multi-channel delivery (Slack, WhatsApp, Teams, web widget), billing, scheduled tasks, and observability — designed for production workloads and product companies.
             </p>
           </div>
         </div>
@@ -85,7 +85,7 @@ export default function OpenClawComparisonPage() {
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
                 <th className="text-left px-5 py-3 font-semibold text-gray-700">Feature</th>
-                <th className="text-center px-5 py-3 font-semibold text-red-600">Synkora</th>
+                <th className="text-center px-5 py-3 font-semibold text-red-600">Katexs</th>
                 <th className="text-center px-5 py-3 font-semibold text-gray-700">OpenClaw</th>
               </tr>
             </thead>
@@ -93,7 +93,7 @@ export default function OpenClawComparisonPage() {
               {features.map((row, i) => (
                 <tr key={row.name} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}>
                   <td className="px-5 py-3 text-gray-700">{row.name}</td>
-                  <td className="px-5 py-3 text-center"><Cell value={row.synkora as 'yes' | 'no' | 'partial'} /></td>
+                  <td className="px-5 py-3 text-center"><Cell value={row.katexs as 'yes' | 'no' | 'partial'} /></td>
                   <td className="px-5 py-3 text-center"><Cell value={row.openclaw as 'yes' | 'no' | 'partial'} /></td>
                 </tr>
               ))}
@@ -106,7 +106,7 @@ export default function OpenClawComparisonPage() {
 
         <div className="grid md:grid-cols-2 gap-8 mb-16">
           <div className="border border-red-200 rounded-xl p-6">
-            <h2 className="text-lg font-semibold text-red-700 mb-4">When to choose Synkora</h2>
+            <h2 className="text-lg font-semibold text-red-700 mb-4">When to choose Katexs</h2>
             <ul className="space-y-2 text-sm text-gray-700">
               <li className="flex gap-2"><Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />You&apos;re a team or company building an AI-powered product</li>
               <li className="flex gap-2"><Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />You need multi-tenant agent management across workspaces</li>
@@ -128,8 +128,8 @@ export default function OpenClawComparisonPage() {
         </div>
 
         <div className="bg-gradient-to-r from-red-500 to-rose-600 rounded-2xl p-8 text-center text-white">
-          <h2 className="text-2xl font-bold mb-2">Try Synkora free</h2>
-          <p className="text-white/90 mb-6">Self-host in minutes or use Synkora Cloud. MIT licensed.</p>
+          <h2 className="text-2xl font-bold mb-2">Try Katexs free</h2>
+          <p className="text-white/90 mb-6">Self-host in minutes or use Katexs Cloud. MIT licensed.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link href="/signup" className="px-6 py-3 bg-white text-red-600 font-semibold rounded-xl hover:bg-gray-50 transition-colors">
               Get Started Free

@@ -3,24 +3,24 @@ import { Check, X, Minus } from 'lucide-react'
 import PublicPageFrame from '@/components/public/PublicPageFrame'
 
 export const metadata = {
-  title: 'Synkora vs Flowise',
-  description: 'Synkora vs Flowise: production multi-tenant platform vs local drag-and-drop flow builder. Compare features, deployment, and use cases.',
+  title: 'Katexs vs Flowise',
+  description: 'Katexs vs Flowise: production multi-tenant platform vs local drag-and-drop flow builder. Compare features, deployment, and use cases.',
 }
 
 const features = [
-  { name: 'Multi-tenant', synkora: 'yes', flowise: 'no' },
-  { name: 'Production-grade deployment', synkora: 'yes', flowise: 'partial' },
-  { name: 'Self-hostable', synkora: 'yes', flowise: 'yes' },
-  { name: 'API-first', synkora: 'yes', flowise: 'partial' },
-  { name: 'RAG / knowledge bases', synkora: 'yes', flowise: 'yes' },
-  { name: 'Multi-channel (Slack, WhatsApp, Teams)', synkora: 'yes', flowise: 'no' },
-  { name: 'MCP server support', synkora: 'yes', flowise: 'no' },
-  { name: 'HITL approval gates', synkora: 'yes', flowise: 'no' },
-  { name: 'Sub-agents', synkora: 'yes', flowise: 'partial' },
-  { name: 'Built-in billing / credits', synkora: 'yes', flowise: 'no' },
-  { name: 'Scheduled tasks', synkora: 'yes', flowise: 'no' },
-  { name: 'Visual drag-and-drop builder', synkora: 'partial', flowise: 'yes' },
-  { name: 'Local-first / desktop friendly', synkora: 'no', flowise: 'yes' },
+  { name: 'Multi-tenant', katexs: 'yes', flowise: 'no' },
+  { name: 'Production-grade deployment', katexs: 'yes', flowise: 'partial' },
+  { name: 'Self-hostable', katexs: 'yes', flowise: 'yes' },
+  { name: 'API-first', katexs: 'yes', flowise: 'partial' },
+  { name: 'RAG / knowledge bases', katexs: 'yes', flowise: 'yes' },
+  { name: 'Multi-channel (Slack, WhatsApp, Teams)', katexs: 'yes', flowise: 'no' },
+  { name: 'MCP server support', katexs: 'yes', flowise: 'no' },
+  { name: 'HITL approval gates', katexs: 'yes', flowise: 'no' },
+  { name: 'Sub-agents', katexs: 'yes', flowise: 'partial' },
+  { name: 'Built-in billing / credits', katexs: 'yes', flowise: 'no' },
+  { name: 'Scheduled tasks', katexs: 'yes', flowise: 'no' },
+  { name: 'Visual drag-and-drop builder', katexs: 'partial', flowise: 'yes' },
+  { name: 'Local-first / desktop friendly', katexs: 'no', flowise: 'yes' },
 ]
 
 function Cell({ value }: { value: 'yes' | 'no' | 'partial' }) {
@@ -33,9 +33,9 @@ const breadcrumbLd = {
   '@context': 'https://schema.org',
   '@type': 'BreadcrumbList',
   itemListElement: [
-    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://synkora.ai' },
-    { '@type': 'ListItem', position: 2, name: 'Alternatives', item: 'https://synkora.ai/alternatives' },
-    { '@type': 'ListItem', position: 3, name: 'Synkora vs Flowise', item: 'https://synkora.ai/alternatives/flowise' },
+    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://katexs.ai' },
+    { '@type': 'ListItem', position: 2, name: 'Alternatives', item: 'https://katexs.ai/alternatives' },
+    { '@type': 'ListItem', position: 3, name: 'Katexs vs Flowise', item: 'https://katexs.ai/alternatives/flowise' },
   ],
 }
 
@@ -52,9 +52,9 @@ export default function FlowiseComparisonPage() {
           <span>Flowise</span>
         </div>
 
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">Synkora vs Flowise</h1>
+        <h1 className="text-4xl font-bold text-gray-900 mb-4">Katexs vs Flowise</h1>
         <p className="text-xl text-gray-600 mb-12 max-w-3xl">
-          Flowise is a drag-and-drop LLM flow builder, designed for local use and rapid prototyping. Synkora is a production multi-tenant platform. If you're prototyping solo, Flowise is excellent. If you're deploying for teams or customers, Synkora is built for that.
+          Flowise is a drag-and-drop LLM flow builder, designed for local use and rapid prototyping. Katexs is a production multi-tenant platform. If you're prototyping solo, Flowise is excellent. If you're deploying for teams or customers, Katexs is built for that.
         </p>
 
         <div className="grid md:grid-cols-2 gap-8 mb-16">
@@ -65,9 +65,9 @@ export default function FlowiseComparisonPage() {
             </p>
           </div>
           <div className="bg-red-50 rounded-xl p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-3">What is Synkora?</h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-3">What is Katexs?</h2>
             <p className="text-gray-600 text-sm leading-relaxed">
-              Synkora is a multitenant LLM platform built for production. It handles multi-tenant team access, API-first agent deployment, multi-channel delivery (Slack, WhatsApp, Teams, Telegram), RAG knowledge bases, billing, scheduled tasks, and observability — all in one self-hostable platform.
+              Katexs is a multitenant LLM platform built for production. It handles multi-tenant team access, API-first agent deployment, multi-channel delivery (Slack, WhatsApp, Teams, Telegram), RAG knowledge bases, billing, scheduled tasks, and observability — all in one self-hostable platform.
             </p>
           </div>
         </div>
@@ -78,7 +78,7 @@ export default function FlowiseComparisonPage() {
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
                 <th className="text-left px-5 py-3 font-semibold text-gray-700">Feature</th>
-                <th className="text-center px-5 py-3 font-semibold text-red-600">Synkora</th>
+                <th className="text-center px-5 py-3 font-semibold text-red-600">Katexs</th>
                 <th className="text-center px-5 py-3 font-semibold text-gray-700">Flowise</th>
               </tr>
             </thead>
@@ -86,7 +86,7 @@ export default function FlowiseComparisonPage() {
               {features.map((row, i) => (
                 <tr key={row.name} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}>
                   <td className="px-5 py-3 text-gray-700">{row.name}</td>
-                  <td className="px-5 py-3 text-center"><Cell value={row.synkora as 'yes' | 'no' | 'partial'} /></td>
+                  <td className="px-5 py-3 text-center"><Cell value={row.katexs as 'yes' | 'no' | 'partial'} /></td>
                   <td className="px-5 py-3 text-center"><Cell value={row.flowise as 'yes' | 'no' | 'partial'} /></td>
                 </tr>
               ))}
@@ -99,7 +99,7 @@ export default function FlowiseComparisonPage() {
 
         <div className="grid md:grid-cols-2 gap-8 mb-16">
           <div className="border border-red-200 rounded-xl p-6">
-            <h2 className="text-lg font-semibold text-red-700 mb-4">When to choose Synkora</h2>
+            <h2 className="text-lg font-semibold text-red-700 mb-4">When to choose Katexs</h2>
             <ul className="space-y-2 text-sm text-gray-700">
               <li className="flex gap-2"><Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />You're deploying agents for a team or customer-facing product</li>
               <li className="flex gap-2"><Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />You need multi-tenant access control across workspaces</li>
@@ -120,8 +120,8 @@ export default function FlowiseComparisonPage() {
         </div>
 
         <div className="bg-gradient-to-r from-red-500 to-rose-600 rounded-2xl p-8 text-center text-white">
-          <h2 className="text-2xl font-bold mb-2">Try Synkora free</h2>
-          <p className="text-white/90 mb-6">Self-host in minutes or use Synkora Cloud. MIT licensed.</p>
+          <h2 className="text-2xl font-bold mb-2">Try Katexs free</h2>
+          <p className="text-white/90 mb-6">Self-host in minutes or use Katexs Cloud. MIT licensed.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link href="/signup" className="px-6 py-3 bg-white text-red-600 font-semibold rounded-xl hover:bg-gray-50 transition-colors">
               Get Started Free

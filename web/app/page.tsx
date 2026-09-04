@@ -15,7 +15,7 @@ import { formatStars } from '@/lib/utils/formatStars'
 
 async function getGitHubStars(): Promise<number | null> {
   try {
-    const res = await fetch('https://api.github.com/repos/getsynkora/synkora-ai', {
+    const res = await fetch('https://api.github.com/repos/getkatexs/katexs-ai', {
       next: { revalidate: 3600 },
       headers: { Accept: 'application/vnd.github+json' },
     })
@@ -66,7 +66,7 @@ export default async function LandingPage() {
             </div>
             <div className="hidden h-8 w-px bg-black/10 sm:block" />
             <a
-              href="https://github.com/getsynkora/synkora-ai"
+              href="https://github.com/getkatexs/katexs-ai"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 text-[#6d675f] transition-colors hover:text-black"
@@ -145,7 +145,7 @@ export default async function LandingPage() {
                 Your infrastructure. Your data. Your rules.
               </h2>
               <p className="mb-6 leading-relaxed text-[#cfc7bb]">
-                Run Synkora on your own servers with Docker. No data leaves your environment. Use your own PostgreSQL, Redis, and S3-compatible storage. MIT licensed — no usage fees, no phone-home.
+                Run Katexs on your own servers with Docker. No data leaves your environment. Use your own PostgreSQL, Redis, and S3-compatible storage. MIT licensed — no usage fees, no phone-home.
               </p>
               <div className="flex flex-col gap-3 sm:flex-row">
                 <a
@@ -156,7 +156,7 @@ export default async function LandingPage() {
                   <ArrowRight className="h-4 w-4" />
                 </a>
                 <a
-                  href="https://github.com/getsynkora/synkora-ai"
+                  href="https://github.com/getkatexs/katexs-ai"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/5 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-white/10"
@@ -178,8 +178,8 @@ export default async function LandingPage() {
               </div>
               <div className="space-y-2 text-sm">
                 <div><span className="text-[#7d766c]"># Clone the repo</span></div>
-                <div><span className="text-[#7de5c1]">$</span> <span className="text-white">git clone https://github.com/getsynkora/synkora-ai</span></div>
-                <div><span className="text-[#7de5c1]">$</span> <span className="text-white">cd synkora-ai</span></div>
+                <div><span className="text-[#7de5c1]">$</span> <span className="text-white">git clone https://github.com/getkatexs/katexs-ai</span></div>
+                <div><span className="text-[#7de5c1]">$</span> <span className="text-white">cd katexs-ai</span></div>
                 <div className="pt-1"><span className="text-[#7d766c]"># Copy env and start</span></div>
                 <div><span className="text-[#7de5c1]">$</span> <span className="text-white">cp .env.example .env</span></div>
                 <div><span className="text-[#7de5c1]">$</span> <span className="text-white">docker-compose up -d</span></div>
@@ -199,7 +199,7 @@ export default async function LandingPage() {
           <div className="mb-12 text-center">
             <h2 className="mb-3 text-3xl font-medium tracking-[-0.04em] text-[#171717]">Platform, not a framework</h2>
             <p className="mx-auto max-w-xl text-lg leading-relaxed text-[#575149]">
-              Frameworks give you building blocks. Synkora gives you the whole platform — deployed, monitored, and ready to use.
+              Frameworks give you building blocks. Katexs gives you the whole platform — deployed, monitored, and ready to use.
             </p>
           </div>
 
@@ -214,7 +214,7 @@ export default async function LandingPage() {
                 cta: null,
               },
               {
-                name: 'Synkora',
+                name: 'Katexs',
                 color: 'border-[#79dfbc] ring-2 ring-[#79dfbc]',
                 tag: 'Platform',
                 tagColor: 'bg-[#79dfbc]/25 text-[#153129]',
@@ -248,7 +248,7 @@ export default async function LandingPage() {
                 </ul>
                 {col.cta && (
                   <Link
-                    href="https://app.synkora.ai/signup"
+                    href="https://app.katexs.ai/signup"
                     className="block w-full rounded-full bg-[#191919] px-4 py-2.5 text-center text-sm font-semibold uppercase tracking-[0.14em] text-[#f7f2e7] transition-transform hover:-translate-y-0.5"
                   >
                     {col.cta}

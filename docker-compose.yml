@@ -431,6 +431,12 @@ services:
       context: ./api
       dockerfile: Dockerfile.dev
     container_name: synkora-api
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.synkora-api.entrypoints=websecure"
+      - "traefik.http.routers.synkora-api.rule=Host(`api.katexs.tech`)"
+      - "traefik.http.routers.synkora-api.tls.certresolver=letsencrypt"
+      - "traefik.http.services.synkora-api.loadbalancer.server.port=5001"
     env_file:
       - ./api/.env
     environment:
@@ -778,6 +784,25 @@ services:
   #     retries: 3
   #   networks:
   #     - synkora-network
+
+  # Web Frontend Proxy (routes HTTPS traffic via Traefik to the
+  # systemd-managed Next.js production process on the host, port 3005)
+  web:
+    image: nginx:alpine
+    container_name: synkora-web-proxy
+    restart: always
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    command: >
+      sh -c "echo 'server { listen 80; location / { proxy_pass http://host.docker.internal:3005; proxy_set_header Host $$host; proxy_set_header X-Real-IP $$remote_addr; proxy_set_header X-Forwarded-For $$proxy_add_x_forwarded_for; proxy_set_header X-Forwarded-Proto $$scheme; } }' > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.synkora-web.entrypoints=websecure"
+      - "traefik.http.routers.synkora-web.rule=Host(`app.katexs.tech`)"
+      - "traefik.http.routers.synkora-web.tls.certresolver=letsencrypt"
+      - "traefik.http.services.synkora-web.loadbalancer.server.port=80"
+    networks:
+      - synkora-network
 
 volumes:
   postgres_data:

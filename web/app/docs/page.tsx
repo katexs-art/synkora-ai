@@ -5,8 +5,8 @@ import PublicPageFrame from '@/components/public/PublicPageFrame'
 import { getDocsHomeSections, getDocsNavigation } from '@/lib/content'
 
 export const metadata = {
-  title: 'Docs – Synkora',
-  description: 'Documentation for setup, integrations, APIs, deployment, and architecture in the main Synkora web app.',
+  title: 'Docs – Katexs',
+  description: 'Documentation for setup, integrations, APIs, deployment, and architecture in the main Katexs web app.',
 }
 
 export default async function DocsPage() {
@@ -27,7 +27,7 @@ export default async function DocsPage() {
             Documentation
           </p>
           <h1 className="mt-3 text-4xl font-semibold tracking-[-0.05em] text-[#171717] sm:text-5xl">
-            Everything now lives in the main Synkora app
+            Everything now lives in the main Katexs app
           </h1>
           <p className="mt-4 max-w-3xl text-lg leading-8 text-[#5b564e]">
             Setup guides, API reference, SDK docs, and architecture notes no longer need a separate Docusaurus surface.

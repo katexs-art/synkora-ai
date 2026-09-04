@@ -640,7 +640,7 @@ function ConnectDataSourceContent() {
                   <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#a1722a]">OAuth Required</p>
                   <h3 className="text-2xl font-semibold tracking-[-0.03em] text-[#4e3415]">OAuth app not configured</h3>
                   <p className="max-w-3xl text-sm leading-6 text-[#725433]">
-                    You need to configure a {selectedSource?.label || 'data source'} OAuth app before you can connect this integration. OAuth apps let Synkora securely access your account on your behalf.
+                    You need to configure a {selectedSource?.label || 'data source'} OAuth app before you can connect this integration. OAuth apps let Katexs securely access your account on your behalf.
                   </p>
                 </div>
 
@@ -649,7 +649,7 @@ function ConnectDataSourceContent() {
                   <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm leading-6 text-gray-700">
                     <li>Create a {selectedSource?.label || 'provider'} OAuth app in the provider developer console.</li>
                     <li>Configure the required scopes and callback URL.</li>
-                    <li>Add the OAuth credentials to Synkora.</li>
+                    <li>Add the OAuth credentials to Katexs.</li>
                     <li>Return here and continue the connection flow.</li>
                   </ol>
                 </div>

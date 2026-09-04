@@ -3,8 +3,8 @@ import { Zap, ArrowRight, Users, Code, BarChart3, HeadphonesIcon, PenTool, Datab
 import PublicPageFrame from '@/components/public/PublicPageFrame'
 
 export const metadata = {
-  title: 'Use Cases – Synkora LLM Platform',
-  description: 'See what you can build on Synkora — AI agents for product management, engineering, customer support, marketing, and more. API-first, multitenant, self-hostable.',
+  title: 'Use Cases – Katexs LLM Platform',
+  description: 'See what you can build on Katexs — AI agents for product management, engineering, customer support, marketing, and more. API-first, multitenant, self-hostable.',
 }
 
 const useCases = [
@@ -237,11 +237,11 @@ export default function UseCasesPage() {
         </div>
       </section>
 
-      {/* Why Synkora Section */}
+      {/* Why Katexs Section */}
       <section className="py-20 px-6 bg-white">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Why Teams Choose Synkora</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Why Teams Choose Katexs</h2>
             <p className="text-lg text-gray-600">Built different from day one</p>
           </div>
 

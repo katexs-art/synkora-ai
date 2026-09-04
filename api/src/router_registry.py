@@ -407,6 +407,14 @@ ROUTER_REGISTRY: list[RouteConfig] = [
         prefix="/api/v1/voice",
         tags=["voice"],
     ),
+    # ===== Vapi Integration =====
+    RouteConfig(
+        module="src.controllers.vapi",
+        attribute="router",
+        prefix="/api/v1/vapi",
+        tags=["vapi"],
+    ),
+    # ===== Phone Calls (inbound) =====
     # ===== Phone Calls (inbound) =====
     RouteConfig(
         module="src.controllers.phone_calls",
@@ -696,6 +704,12 @@ ROUTER_REGISTRY: list[RouteConfig] = [
         attribute="router",
         prefix="",
         tags=["portal"],
+    ),
+    # ===== Katexs product endpoints (MVP) =====
+    RouteConfig(
+        module="src.controllers.katexs",
+        prefix="/api/v1/katexs",
+        tags=["katexs"],
     ),
 ]
 

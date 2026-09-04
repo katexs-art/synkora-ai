@@ -27,7 +27,7 @@ export default function Footer() {
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#7de5c1] text-[#101915] shadow-[0_14px_30px_rgba(125,229,193,0.16)]">
                 <Zap className="h-5 w-5" />
               </div>
-              <span className="text-xl font-semibold tracking-[0.08em]">Synkora</span>
+              <span className="text-xl font-semibold tracking-[0.08em]">Katexs</span>
             </Link>
             <p className="text-sm leading-relaxed text-[#b8b0a4]">
               The open-source LLM application platform. Build, deploy, and manage AI agents at any scale.
@@ -111,7 +111,7 @@ export default function Footer() {
             <h4 className="mb-4 text-sm font-semibold uppercase tracking-[0.16em] text-white">Connect</h4>
             <div className="flex items-center gap-3">
               <Link
-                href="https://github.com/getsynkora/synkora-ai"
+                href="https://github.com/getkatexs/katexs-ai"
                 target="_blank"
                 className="flex h-9 w-9 items-center justify-center rounded-full bg-white/8 transition-colors hover:bg-white/14"
                 aria-label="GitHub"
@@ -121,7 +121,7 @@ export default function Footer() {
                 </svg>
               </Link>
               <Link
-                href="https://discord.gg/synkora-ai"
+                href="https://discord.gg/katexs-ai"
                 target="_blank"
                 className="flex h-9 w-9 items-center justify-center rounded-full bg-white/8 transition-colors hover:bg-white/14"
                 aria-label="Discord"
@@ -131,7 +131,7 @@ export default function Footer() {
                 </svg>
               </Link>
               <Link
-                href="https://twitter.com/synkora_ai"
+                href="https://twitter.com/katexs_ai"
                 target="_blank"
                 className="flex h-9 w-9 items-center justify-center rounded-full bg-white/8 transition-colors hover:bg-white/14"
                 aria-label="Twitter"
@@ -141,7 +141,7 @@ export default function Footer() {
                 </svg>
               </Link>
               <Link
-                href="https://linkedin.com/company/synkora-ai"
+                href="https://linkedin.com/company/katexs-ai"
                 target="_blank"
                 className="flex h-9 w-9 items-center justify-center rounded-full bg-white/8 transition-colors hover:bg-white/14"
                 aria-label="LinkedIn"
@@ -151,7 +151,7 @@ export default function Footer() {
                 </svg>
               </Link>
               <Link
-                href="https://facebook.com/synkora.ai"
+                href="https://facebook.com/katexs.ai"
                 target="_blank"
                 className="flex h-9 w-9 items-center justify-center rounded-full bg-white/8 transition-colors hover:bg-white/14"
                 aria-label="Facebook"
@@ -167,7 +167,7 @@ export default function Footer() {
         <div className="border-t border-white/10 pt-8">
           <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
             <p className="text-sm text-[#b8b0a4]">
-              © {new Date().getFullYear()} Synkora. All rights reserved.
+              © {new Date().getFullYear()} Katexs. All rights reserved.
             </p>
             <div className="flex items-center gap-4">
               <span className="rounded-full bg-white/8 px-3 py-1 text-xs font-medium text-[#b8b0a4]">

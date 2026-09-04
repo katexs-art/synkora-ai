@@ -11,7 +11,7 @@ import {
 import PublicPageFrame from '@/components/public/PublicPageFrame'
 
 export const metadata = {
-  title: 'Page Not Found – Synkora',
+  title: 'Page Not Found – Katexs',
   description: 'The page you are looking for does not exist.',
 }
 

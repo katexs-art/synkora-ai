@@ -347,11 +347,11 @@ export default function WidgetEditPage() {
                 </p>
                 <div className="flex items-center gap-3 flex-wrap">
                   <code className="rounded-md border border-indigo-200 bg-white/90 px-2 py-1 font-mono text-xs text-indigo-800">
-                    flutter pub add synkora_chat
+                    flutter pub add katexs_chat
                   </code>
                   <span className="text-xs text-indigo-500">·</span>
                   <code className="rounded-md border border-indigo-200 bg-white/90 px-2 py-1 font-mono text-xs text-indigo-800">
-                    flutter pub add synkora_push
+                    flutter pub add katexs_push
                   </code>
                   <span className="text-xs text-indigo-400">optional, for push notifications</span>
                 </div>
@@ -681,7 +681,7 @@ export default function WidgetEditPage() {
 
                 <div className="rounded-[1rem] border border-[#e5d9ca] bg-[#fcfaf5] p-3 text-xs text-gray-600">
                   <p className="font-medium mb-1.5">Widget init with identity verification:</p>
-                  <pre className="overflow-x-auto whitespace-pre rounded-[0.9rem] border border-black/5 bg-white/80 p-2 text-[11px]">{`SynkoraWidget.init({
+                  <pre className="overflow-x-auto whitespace-pre rounded-[0.9rem] border border-black/5 bg-white/80 p-2 text-[11px]">{`KatexsWidget.init({
   widgetId:  "your-widget-id",
   apiKey:    "swk_...",
   user:      { id: currentUser.id, name: currentUser.name, orgId: currentOrg.id },
@@ -864,7 +864,7 @@ export default function WidgetEditPage() {
 
                 <div className="rounded-[1rem] border border-[#d8e5d9] bg-[linear-gradient(180deg,_rgba(244,249,245,0.98),_rgba(235,245,238,0.95))] p-3 text-xs text-[#24543b]">
                   Pass <code className={codeInlineClass}>user.orgId</code> in{" "}
-                  <code className={codeInlineClass}>SynkoraWidget.init()</code> to activate routing. Orgs not
+                  <code className={codeInlineClass}>KatexsWidget.init()</code> to activate routing. Orgs not
                   listed above fall back to the widget&apos;s default agent.
                 </div>
               </div>
@@ -907,9 +907,9 @@ export default function WidgetEditPage() {
                 type="button"
                 onClick={() => {
                   const snippets = {
-                    pubspec: `dependencies:\n  synkora_chat: ^1.0.0\n\n# Optional — for push notifications\n  synkora_push: ^1.0.0`,
-                    basic: `import 'package:synkora_chat/synkora_chat.dart';\n\n// Drop-in — place anywhere in your widget tree\nSynkoraChatWidget(\n  widgetKey: '${widgetId}',\n  baseUrl: 'https://your-synkora-instance.com',\n  userId: currentUser.id,  // optional\n  onClose: () => Navigator.pop(context),\n)`,
-                    push: `// main.dart\nvoid main() async {\n  WidgetsFlutterBinding.ensureInitialized();\n  await Firebase.initializeApp();\n\n  await SynkoraPush.init(\n    widgetKey: '${widgetId}',\n    baseUrl: 'https://your-synkora-instance.com',\n    conversationIdProvider: () => chatController.conversationId,\n  );\n\n  // Optional: handle foreground messages\n  SynkoraPush.onMessage = (message) {\n    // show in-app banner or navigate to chat\n  };\n\n  runApp(MyApp());\n}`,
+                    pubspec: `dependencies:\n  katexs_chat: ^1.0.0\n\n# Optional — for push notifications\n  katexs_push: ^1.0.0`,
+                    basic: `import 'package:katexs_chat/katexs_chat.dart';\n\n// Drop-in — place anywhere in your widget tree\nKatexsChatWidget(\n  widgetKey: '${widgetId}',\n  baseUrl: 'https://your-katexs-instance.com',\n  userId: currentUser.id,  // optional\n  onClose: () => Navigator.pop(context),\n)`,
+                    push: `// main.dart\nvoid main() async {\n  WidgetsFlutterBinding.ensureInitialized();\n  await Firebase.initializeApp();\n\n  await KatexsPush.init(\n    widgetKey: '${widgetId}',\n    baseUrl: 'https://your-katexs-instance.com',\n    conversationIdProvider: () => chatController.conversationId,\n  );\n\n  // Optional: handle foreground messages\n  KatexsPush.onMessage = (message) {\n    // show in-app banner or navigate to chat\n  };\n\n  runApp(MyApp());\n}`,
                   };
                   navigator.clipboard.writeText(snippets[flutterTab]);
                 }}
@@ -922,21 +922,21 @@ export default function WidgetEditPage() {
               {flutterTab === "pubspec" && (
                 <pre className="overflow-x-auto rounded-[1rem] bg-[#171717] p-4 text-xs leading-relaxed text-[#f6f1e8]">
 {`dependencies:
-  synkora_chat: ^1.0.0
+  katexs_chat: ^1.0.0
 
   # Optional — for FCM push notifications
-  synkora_push: ^1.0.0`}
+  katexs_push: ^1.0.0`}
                 </pre>
               )}
 
               {flutterTab === "basic" && (
                 <pre className="overflow-x-auto rounded-[1rem] bg-[#171717] p-4 text-xs leading-relaxed text-[#f6f1e8]">
-{`import 'package:synkora_chat/synkora_chat.dart';
+{`import 'package:katexs_chat/katexs_chat.dart';
 
 // Drop-in — place anywhere in your widget tree
-SynkoraChatWidget(
+KatexsChatWidget(
   widgetKey: '${widgetId}',
-  baseUrl: 'https://your-synkora-instance.com',
+  baseUrl: 'https://your-katexs-instance.com',
   userId: currentUser.id,  // optional, for history continuity
   onClose: () => Navigator.pop(context),
 )`}
@@ -946,16 +946,16 @@ SynkoraChatWidget(
               {flutterTab === "push" && (
                 <pre className="overflow-x-auto rounded-[1rem] bg-[#171717] p-4 text-xs leading-relaxed text-[#f6f1e8]">
 {`// main.dart — call once after Firebase.initializeApp()
-import 'package:synkora_push/synkora_push.dart';
+import 'package:katexs_push/katexs_push.dart';
 
-await SynkoraPush.init(
+await KatexsPush.init(
   widgetKey: '${widgetId}',
-  baseUrl: 'https://your-synkora-instance.com',
+  baseUrl: 'https://your-katexs-instance.com',
   conversationIdProvider: () => chatController.conversationId,
 );
 
 // Optional: handle foreground messages
-SynkoraPush.onMessage = (message) {
+KatexsPush.onMessage = (message) {
   // show in-app banner or navigate to chat
   // message.data['conversation_id'] available for deep-linking
 };`}

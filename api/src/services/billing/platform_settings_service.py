@@ -157,6 +157,30 @@ class PlatformSettingsService:
         settings = await self.get_settings()
         return settings.stripe_enabled == "true" and await self.is_stripe_configured()
 
+    async def update_branding(
+        self,
+        platform_name: str | None = None,
+        platform_logo_url: str | None = None,
+        support_email: str | None = None,
+        primary_color: str | None = None,
+        secondary_color: str | None = None,
+    ) -> "PlatformSettings":
+        """Update platform branding fields (singleton row)."""
+        settings = await self.get_settings()
+        if platform_name is not None:
+            settings.platform_name = platform_name
+        if platform_logo_url is not None:
+            settings.platform_logo_url = platform_logo_url
+        if support_email is not None:
+            settings.support_email = support_email
+        if primary_color is not None:
+            settings.primary_color = primary_color
+        if secondary_color is not None:
+            settings.secondary_color = secondary_color
+        await self.db.commit()
+        await self.db.refresh(settings)
+        return settings
+
     async def clear_stripe_keys(self) -> PlatformSettings:
         """
         Clear all Stripe keys (useful for testing or reconfiguration)

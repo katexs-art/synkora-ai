@@ -4,7 +4,7 @@ export const revalidate = 3600
 
 export async function GET() {
   try {
-    const res = await fetch('https://api.github.com/repos/getsynkora/synkora-ai', {
+    const res = await fetch('https://api.github.com/repos/getkatexs/katexs-ai', {
       headers: { Accept: 'application/vnd.github+json' },
       next: { revalidate: 3600 },
     })

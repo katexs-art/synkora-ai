@@ -161,3 +161,66 @@ async def clear_stripe_keys(
         stripe_configured=await service.is_stripe_configured(),
         stripe_publishable_key=settings.stripe_publishable_key,
     )
+
+
+class BrandingUpdate(BaseModel):
+    """Branding fields that admins can change."""
+
+    platform_name: str | None = None
+    platform_logo_url: str | None = None
+    support_email: str | None = None
+    primary_color: str | None = None
+    secondary_color: str | None = None
+
+
+class BrandingResponse(BaseModel):
+    """Branding payload returned to clients."""
+
+    platform_name: str | None = None
+    platform_logo_url: str | None = None
+    support_email: str | None = None
+    primary_color: str | None = None
+    secondary_color: str | None = None
+
+
+def _branding_dict(settings) -> dict:
+    return {
+        "platform_name": settings.platform_name,
+        "platform_logo_url": settings.platform_logo_url,
+        "support_email": settings.support_email,
+        "primary_color": settings.primary_color,
+        "secondary_color": settings.secondary_color,
+    }
+
+
+@router.get("/branding", response_model=BrandingResponse)
+async def get_branding(db: AsyncSession = Depends(get_async_db), _: None = Depends(require_role(AccountRole.ADMIN))):
+    """Get branding (admin)."""
+    service = PlatformSettingsService(db)
+    return _branding_dict(await service.get_settings())
+
+
+@router.put("/branding", response_model=BrandingResponse)
+async def update_branding(
+    data: BrandingUpdate,
+    db: AsyncSession = Depends(get_async_db),
+    _: None = Depends(require_role(AccountRole.ADMIN)),
+):
+    """Update branding (admin)."""
+    service = PlatformSettingsService(db)
+    settings = await service.update_branding(
+        platform_name=data.platform_name,
+        platform_logo_url=data.platform_logo_url,
+        support_email=data.support_email,
+        primary_color=data.primary_color,
+        secondary_color=data.secondary_color,
+    )
+    return _branding_dict(settings)
+
+
+@router.get("/branding/public")
+async def get_branding_public(db: AsyncSession = Depends(get_async_db)):
+    """Public branding for login pages / widgets (no auth)."""
+    service = PlatformSettingsService(db)
+    return _branding_dict(await service.get_settings())
+

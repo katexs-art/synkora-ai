@@ -3,8 +3,8 @@ import { ArrowRight, Zap } from 'lucide-react'
 import PublicPageFrame from '@/components/public/PublicPageFrame'
 
 export const metadata = {
-  title: 'Synkora Alternatives & Comparisons',
-  description: 'How Synkora compares to Dify, CrewAI, LangChain, Flowise, and OpenClaw. Honest, factual comparisons covering platform features, architecture, and target use cases.',
+  title: 'Katexs Alternatives & Comparisons',
+  description: 'How Katexs compares to Dify, CrewAI, LangChain, Flowise, and OpenClaw. Honest, factual comparisons covering platform features, architecture, and target use cases.',
 }
 
 const comparisons = [
@@ -12,7 +12,7 @@ const comparisons = [
     slug: 'dify',
     name: 'Dify',
     type: 'Platform',
-    summary: 'Open-source LLM app platform with a visual workflow DAG editor. Synkora has stronger API-first design and multi-channel deployment.',
+    summary: 'Open-source LLM app platform with a visual workflow DAG editor. Katexs has stronger API-first design and multi-channel deployment.',
   },
   {
     slug: 'crewai',
@@ -30,13 +30,13 @@ const comparisons = [
     slug: 'flowise',
     name: 'Flowise',
     type: 'Visual Builder',
-    summary: 'Drag-and-drop LLM flow builder, local-first and single-user. Good for prototyping; Synkora is built for multi-tenant production.',
+    summary: 'Drag-and-drop LLM flow builder, local-first and single-user. Good for prototyping; Katexs is built for multi-tenant production.',
   },
   {
     slug: 'openclaw',
     name: 'OpenClaw',
     type: 'Personal Assistant',
-    summary: 'Local-first personal AI assistant daemon for individuals. Different use case: OpenClaw is for personal productivity, Synkora is for teams building AI products.',
+    summary: 'Local-first personal AI assistant daemon for individuals. Different use case: OpenClaw is for personal productivity, Katexs is for teams building AI products.',
   },
 ]
 
@@ -50,21 +50,21 @@ export default function AlternativesIndexPage() {
           <span>Alternatives</span>
         </div>
 
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">Synkora Alternatives & Comparisons</h1>
+        <h1 className="text-4xl font-bold text-gray-900 mb-4">Katexs Alternatives & Comparisons</h1>
         <p className="text-xl text-gray-600 mb-4 max-w-3xl">
-          How Synkora fits in the AI landscape alongside frameworks, platforms, and personal tools.
+          How Katexs fits in the AI landscape alongside frameworks, platforms, and personal tools.
         </p>
 
         <div className="bg-blue-50 border border-blue-100 rounded-xl p-6 mb-12 max-w-3xl">
-          <h2 className="font-semibold text-gray-900 mb-2">How Synkora fits in the ecosystem</h2>
+          <h2 className="font-semibold text-gray-900 mb-2">How Katexs fits in the ecosystem</h2>
           <p className="text-gray-700 text-sm leading-relaxed">
-            Synkora is a <strong>multitenant deployment platform</strong> — it sits above frameworks like LangChain and CrewAI,
+            Katexs is a <strong>multitenant deployment platform</strong> — it sits above frameworks like LangChain and CrewAI,
             and alongside self-hostable platforms like Dify. If you need a full-stack environment for building, deploying,
-            and managing AI agents across teams and channels (Slack, WhatsApp, Teams, web widget, API), Synkora is built for that.
+            and managing AI agents across teams and channels (Slack, WhatsApp, Teams, web widget, API), Katexs is built for that.
             If you need maximum Python flexibility or a simple personal assistant, a framework or personal tool may serve you better.
           </p>
           <p className="text-gray-700 text-sm leading-relaxed mt-3">
-            <strong>Platform</strong> — Synkora, Dify &nbsp;|&nbsp; <strong>Framework</strong> — LangChain, CrewAI &nbsp;|&nbsp; <strong>Visual builder</strong> — Flowise &nbsp;|&nbsp; <strong>Personal assistant</strong> — OpenClaw
+            <strong>Platform</strong> — Katexs, Dify &nbsp;|&nbsp; <strong>Framework</strong> — LangChain, CrewAI &nbsp;|&nbsp; <strong>Visual builder</strong> — Flowise &nbsp;|&nbsp; <strong>Personal assistant</strong> — OpenClaw
           </p>
         </div>
 
@@ -77,7 +77,7 @@ export default function AlternativesIndexPage() {
             >
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-1">
-                  <h2 className="text-lg font-semibold text-gray-900">Synkora vs {c.name}</h2>
+                  <h2 className="text-lg font-semibold text-gray-900">Katexs vs {c.name}</h2>
                   <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">{c.type}</span>
                 </div>
                 <p className="text-gray-600 text-sm">{c.summary}</p>

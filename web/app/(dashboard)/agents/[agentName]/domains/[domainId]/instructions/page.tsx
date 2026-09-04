@@ -138,13 +138,13 @@ export default function DomainInstructionsPage() {
   }
 
   // For custom domains: domain.domain is the custom domain (e.g., rajumazumder.com)
-  // For platform domains: domain.subdomain + platform domain (e.g., test.synkora.ai)
+  // For platform domains: domain.subdomain + platform domain (e.g., test.katexs.ai)
   const platformSubdomain = domain.subdomain;
   
   // Display domain based on type
   const displayDomain = domain.is_custom_domain 
     ? domain.domain  // Show custom domain: rajumazumder.com
-    : (domain.subdomain ? `${domain.subdomain}.synkora.ai` : 'synkora.ai'); // Show platform subdomain
+    : (domain.subdomain ? `${domain.subdomain}.katexs.ai` : 'katexs.ai'); // Show platform subdomain
   
   const fullDomain = displayDomain;
 
@@ -230,7 +230,7 @@ export default function DomainInstructionsPage() {
                 How It Works
               </h3>
               <p className="text-xs text-blue-800 mb-2">
-                Your custom domain <span className="font-mono font-semibold">{domain.domain}</span> will point to your agent hosted at <span className="font-mono font-semibold">{platformSubdomain}.synkora.ai</span>.
+                Your custom domain <span className="font-mono font-semibold">{domain.domain}</span> will point to your agent hosted at <span className="font-mono font-semibold">{platformSubdomain}.katexs.ai</span>.
               </p>
               <p className="text-xs text-blue-800">
                 This means visitors can access your agent through your own domain while it's actually served from our platform infrastructure.

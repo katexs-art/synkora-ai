@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { apiClient } from '@/lib/api/client'
 import { extractErrorMessage } from '@/lib/api/error'
+import BrandingCard from '@/components/settings/BrandingCard'
 
 interface PlatformSettings {
   id?: string
@@ -88,6 +89,8 @@ export default function PlatformSettingsPage() {
           {message.text}
         </div>
       )}
+
+      <BrandingCard />
 
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* Stripe Configuration */}

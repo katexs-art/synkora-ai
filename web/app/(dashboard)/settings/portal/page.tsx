@@ -219,21 +219,21 @@ export default function PortalSettingsPage() {
           <div className="bg-gray-50 rounded-lg border border-gray-200 p-5">
             <h3 className="text-sm font-semibold text-gray-900 mb-1.5">Deploy Your Portal</h3>
             <p className="text-xs text-gray-600 mb-3">
-              Fork the <strong>synkora-portal</strong> repository, set these two environment variables, and
+              Fork the <strong>katexs-portal</strong> repository, set these two environment variables, and
               deploy anywhere — Vercel, self-hosted, or any static host.
             </p>
             <div className="font-mono text-xs bg-white border border-gray-200 rounded p-3 space-y-1 text-gray-800">
-              <p>NEXT_PUBLIC_SYNKORA_API_URL=https://your-api.com</p>
+              <p>NEXT_PUBLIC_KATEXS_API_URL=https://your-api.com</p>
               <p>NEXT_PUBLIC_TENANT_SLUG={portal?.subdomain ?? 'your-slug'}</p>
             </div>
             <a
-              href="https://github.com/your-org/synkora-portal"
+              href="https://github.com/your-org/katexs-portal"
               target="_blank"
               rel="noopener noreferrer"
               className="mt-3 inline-flex items-center gap-1.5 text-xs text-gray-700 hover:underline font-medium"
             >
               <ExternalLink className="w-3 h-3" />
-              Fork synkora-portal on GitHub
+              Fork katexs-portal on GitHub
             </a>
           </div>
 

@@ -244,7 +244,7 @@ function buildShareCaption(data: {
   const strength = data.strengths[0]
   const edge = data.growthEdges[0]
   const scorePart = data.scoreLabel ? ` ${data.scoreLabel}.` : ''
-  const base = `I ran a Synkora mindset assessment on my ${data.domain.toLowerCase()} style. Result: ${data.classification}.${scorePart}`
+  const base = `I ran a Katexs mindset assessment on my ${data.domain.toLowerCase()} style. Result: ${data.classification}.${scorePart}`
 
   const tone = getToneFromClassification(data.classification)
   if (tone === 'growth') {

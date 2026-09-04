@@ -179,6 +179,7 @@ class PhoneConfigService:
             "name": f"synkora-{agent_slug}",
             "model": {
                 "provider": "custom-llm",
+                "model": "gpt-4o-mini",
                 "url": webhook_url,
                 "urlRequestMetadataEnabled": True,
             },

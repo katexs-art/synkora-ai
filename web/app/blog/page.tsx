@@ -4,8 +4,8 @@ import PublicPageFrame from '@/components/public/PublicPageFrame'
 import { getAllBlogPosts } from '@/lib/content'
 
 export const metadata = {
-  title: 'Blog – Synkora',
-  description: 'Architecture deep dives, launch notes, and practical guides from the Synkora team.',
+  title: 'Blog – Katexs',
+  description: 'Architecture deep dives, launch notes, and practical guides from the Katexs team.',
 }
 
 export default async function BlogPage({
@@ -129,7 +129,7 @@ export default async function BlogPage({
             <div className="max-w-3xl">
               <div className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/80 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#6f675d]">
                 <span className="h-2 w-2 rounded-full bg-[#2d8b69]" />
-                Synkora Blog
+                Katexs Blog
               </div>
 
               <h1 className="mt-5 text-4xl font-semibold leading-[0.98] tracking-[-0.06em] text-[#171717] sm:text-5xl lg:text-[3.85rem]">
@@ -138,7 +138,7 @@ export default async function BlogPage({
 
               <p className="mt-5 max-w-2xl text-[17px] leading-8 text-[#5b564e] sm:text-[18px]">
                 Launches, architecture decisions, implementation lessons, and practical guides from the team building
-                Synkora. Less vague AI commentary. More product, systems, and execution.
+                Katexs. Less vague AI commentary. More product, systems, and execution.
               </p>
 
               {topicStats.length > 0 && (
@@ -179,7 +179,7 @@ export default async function BlogPage({
                   {latestDate ? `Most recent publication: ${latestDate}.` : 'New writing will appear here as it ships.'}
                 </p>
                 <p className="mt-2 text-sm leading-6 text-[#c9bfae]">
-                  {allAuthors.size > 0 ? `${allAuthors.size} contributing voice${allAuthors.size > 1 ? 's' : ''}.` : 'Written by the Synkora team.'}
+                  {allAuthors.size > 0 ? `${allAuthors.size} contributing voice${allAuthors.size > 1 ? 's' : ''}.` : 'Written by the Katexs team.'}
                 </p>
               </div>
             </div>

@@ -66,6 +66,16 @@ export async function proxy(request: NextRequest) {
     }
   }
   
+  // Katexs: platform root → sign-in (no public marketing home).
+  // Custom domains keep their agent-resolution behavior above.
+  const isPlatformHost =
+    hostname === 'app.katexs.tech' ||
+    hostname.startsWith('localhost') ||
+    isIpAddress
+  if (pathname === '/' && isPlatformHost) {
+    return NextResponse.redirect(new URL('/signin', request.url))
+  }
+
   return NextResponse.next()
 }
 

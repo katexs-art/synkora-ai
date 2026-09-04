@@ -150,10 +150,10 @@ export default function AdvancedChatPage() {
         title: 'Connect',
         content: {
           links: [
-            { label: 'Twitter', handle: '@synkora', url: 'https://twitter.com/synkora', icon: '🐦' },
-            { label: 'LinkedIn', handle: 'company/synkora', url: 'https://linkedin.com/company/synkora', icon: '💼' },
-            { label: 'GitHub', handle: '@rajuniit/synkora-ai', url: 'https://github.com/rajuniit/synkora-ai', icon: '💻' },
-            { label: 'Email', handle: 'hello@synkora.ai', url: 'mailto:hello@synkora.ai', icon: '✉️' }
+            { label: 'Twitter', handle: '@katexs', url: 'https://twitter.com/katexs', icon: '🐦' },
+            { label: 'LinkedIn', handle: 'company/katexs', url: 'https://linkedin.com/company/katexs', icon: '💼' },
+            { label: 'GitHub', handle: '@rajuniit/katexs-ai', url: 'https://github.com/rajuniit/katexs-ai', icon: '💻' },
+            { label: 'Email', handle: 'hello@katexs.ai', url: 'mailto:hello@katexs.ai', icon: '✉️' }
           ]
         }
       },
@@ -1239,7 +1239,7 @@ export default function AdvancedChatPage() {
             {/* Collapsed State - Show Icons */}
             {!isSidebarExpanded && !isMobileSidebarOpen && (
               <div className="flex h-full flex-col bg-[rgba(252,249,244,0.8)] pt-3">
-                {/* Synkora Logo */}
+                {/* Katexs Logo */}
                 <div className="flex justify-center mb-4">
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#171717]">
                     <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">

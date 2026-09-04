@@ -2,8 +2,8 @@ import Link from 'next/link'
 import PublicPageFrame from '@/components/public/PublicPageFrame'
 
 export const metadata = {
-  title: 'Terms of Service – Synkora',
-  description: 'Read the Synkora Terms of Service. Governs your use of the open-source LLM application platform, whether self-hosted or on Synkora Cloud.',
+  title: 'Terms of Service – Katexs',
+  description: 'Read the Katexs Terms of Service. Governs your use of the open-source LLM application platform, whether self-hosted or on Katexs Cloud.',
 }
 
 export default function TermsOfServicePage() {
@@ -30,7 +30,7 @@ export default function TermsOfServicePage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">1. Acceptance of Terms</h2>
             <p className="text-gray-700 mb-4">
-              By accessing or using Synkora's services, you agree to be bound by these Terms of Service. 
+              By accessing or using Katexs's services, you agree to be bound by these Terms of Service. 
               If you do not agree to these terms, please do not use our services.
             </p>
           </section>
@@ -38,7 +38,7 @@ export default function TermsOfServicePage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">2. Description of Service</h2>
             <p className="text-gray-700 mb-4">
-              Synkora provides an AI-powered agent platform that enables users to create, deploy, and manage 
+              Katexs provides an AI-powered agent platform that enables users to create, deploy, and manage 
               intelligent agents. Our services include but are not limited to:
             </p>
             <ul className="list-disc list-inside text-gray-700 mb-4 ml-4">
@@ -80,7 +80,7 @@ export default function TermsOfServicePage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">5. Intellectual Property</h2>
             <p className="text-gray-700 mb-4">
-              All content, features, and functionality of Synkora are owned by us and are protected by 
+              All content, features, and functionality of Katexs are owned by us and are protected by 
               international copyright, trademark, and other intellectual property laws.
             </p>
             <p className="text-gray-700 mb-4">
@@ -118,7 +118,7 @@ export default function TermsOfServicePage() {
             </ul>
             <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">Refund Process</h3>
             <ul className="list-disc list-inside text-gray-700 mb-4 ml-4">
-              <li>All refund requests should be submitted to our support team at support@synkora.ai</li>
+              <li>All refund requests should be submitted to our support team at support@katexs.ai</li>
               <li>Refunds are processed through Paddle, our Merchant of Record</li>
               <li>Approved refunds will be credited to the original payment method within 5-10 business days</li>
               <li>You will receive email confirmation once the refund is processed</li>
@@ -172,7 +172,7 @@ export default function TermsOfServicePage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">11. Limitation of Liability</h2>
             <p className="text-gray-700 mb-4">
-              To the maximum extent permitted by law, Synkora shall not be liable for any indirect,
+              To the maximum extent permitted by law, Katexs shall not be liable for any indirect,
               incidental, special, consequential, or punitive damages resulting from your use of our services.
             </p>
           </section>
@@ -192,7 +192,7 @@ export default function TermsOfServicePage() {
               If you have any questions about these Terms of Service, please contact us at:
             </p>
             <p className="text-gray-700">
-              Email: <a href="mailto:support@synkora.ai" className="text-primary-500 hover:text-primary-600">support@synkora.ai</a>
+              Email: <a href="mailto:support@katexs.ai" className="text-primary-500 hover:text-primary-600">support@katexs.ai</a>
             </p>
           </section>
         </div>

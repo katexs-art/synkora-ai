@@ -3,23 +3,23 @@ import { Check, X, Minus } from 'lucide-react'
 import PublicPageFrame from '@/components/public/PublicPageFrame'
 
 export const metadata = {
-  title: 'Synkora vs CrewAI',
-  description: 'Synkora vs CrewAI: platform vs Python framework. Synkora adds web UI, multi-tenancy, deployment channels, RAG, billing, and monitoring on top of agent orchestration.',
+  title: 'Katexs vs CrewAI',
+  description: 'Katexs vs CrewAI: platform vs Python framework. Katexs adds web UI, multi-tenancy, deployment channels, RAG, billing, and monitoring on top of agent orchestration.',
 }
 
 const features = [
-  { name: 'Web UI', synkora: 'yes', crewai: 'no' },
-  { name: 'Multi-tenant', synkora: 'yes', crewai: 'no' },
-  { name: 'Self-hostable', synkora: 'yes', crewai: 'no' },
-  { name: 'RAG / knowledge bases', synkora: 'yes', crewai: 'no' },
-  { name: 'Multi-channel deployment (Slack, WhatsApp…)', synkora: 'yes', crewai: 'no' },
-  { name: 'Built-in billing / credits', synkora: 'yes', crewai: 'no' },
-  { name: 'Scheduled tasks', synkora: 'yes', crewai: 'no' },
-  { name: 'Observability / tracing', synkora: 'yes', crewai: 'partial' },
-  { name: 'Multi-agent orchestration', synkora: 'yes', crewai: 'yes' },
-  { name: 'Role-based agent definitions', synkora: 'partial', crewai: 'yes' },
-  { name: 'Full Python API flexibility', synkora: 'no', crewai: 'yes' },
-  { name: 'Embeddable in any Python app', synkora: 'no', crewai: 'yes' },
+  { name: 'Web UI', katexs: 'yes', crewai: 'no' },
+  { name: 'Multi-tenant', katexs: 'yes', crewai: 'no' },
+  { name: 'Self-hostable', katexs: 'yes', crewai: 'no' },
+  { name: 'RAG / knowledge bases', katexs: 'yes', crewai: 'no' },
+  { name: 'Multi-channel deployment (Slack, WhatsApp…)', katexs: 'yes', crewai: 'no' },
+  { name: 'Built-in billing / credits', katexs: 'yes', crewai: 'no' },
+  { name: 'Scheduled tasks', katexs: 'yes', crewai: 'no' },
+  { name: 'Observability / tracing', katexs: 'yes', crewai: 'partial' },
+  { name: 'Multi-agent orchestration', katexs: 'yes', crewai: 'yes' },
+  { name: 'Role-based agent definitions', katexs: 'partial', crewai: 'yes' },
+  { name: 'Full Python API flexibility', katexs: 'no', crewai: 'yes' },
+  { name: 'Embeddable in any Python app', katexs: 'no', crewai: 'yes' },
 ]
 
 function Cell({ value }: { value: 'yes' | 'no' | 'partial' }) {
@@ -32,9 +32,9 @@ const breadcrumbLd = {
   '@context': 'https://schema.org',
   '@type': 'BreadcrumbList',
   itemListElement: [
-    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://synkora.ai' },
-    { '@type': 'ListItem', position: 2, name: 'Alternatives', item: 'https://synkora.ai/alternatives' },
-    { '@type': 'ListItem', position: 3, name: 'Synkora vs CrewAI', item: 'https://synkora.ai/alternatives/crewai' },
+    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://katexs.ai' },
+    { '@type': 'ListItem', position: 2, name: 'Alternatives', item: 'https://katexs.ai/alternatives' },
+    { '@type': 'ListItem', position: 3, name: 'Katexs vs CrewAI', item: 'https://katexs.ai/alternatives/crewai' },
   ],
 }
 
@@ -51,9 +51,9 @@ export default function CrewAIComparisonPage() {
           <span>CrewAI</span>
         </div>
 
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">Synkora vs CrewAI</h1>
+        <h1 className="text-4xl font-bold text-gray-900 mb-4">Katexs vs CrewAI</h1>
         <p className="text-xl text-gray-600 mb-12 max-w-3xl">
-          CrewAI is a Python framework for role-based multi-agent orchestration. Synkora is a full deployment platform. They solve different problems — the choice depends on whether you need infrastructure or code-level flexibility.
+          CrewAI is a Python framework for role-based multi-agent orchestration. Katexs is a full deployment platform. They solve different problems — the choice depends on whether you need infrastructure or code-level flexibility.
         </p>
 
         <div className="grid md:grid-cols-2 gap-8 mb-16">
@@ -64,9 +64,9 @@ export default function CrewAIComparisonPage() {
             </p>
           </div>
           <div className="bg-red-50 rounded-xl p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-3">What is Synkora?</h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-3">What is Katexs?</h2>
             <p className="text-gray-600 text-sm leading-relaxed">
-              Synkora is a multitenant LLM application platform. It includes a web UI for agent creation, RAG knowledge bases, multi-channel deployment (Slack, WhatsApp, Teams, Telegram, web widget), built-in billing, scheduled tasks, and an observability layer — all accessible via API or UI without writing infrastructure code.
+              Katexs is a multitenant LLM application platform. It includes a web UI for agent creation, RAG knowledge bases, multi-channel deployment (Slack, WhatsApp, Teams, Telegram, web widget), built-in billing, scheduled tasks, and an observability layer — all accessible via API or UI without writing infrastructure code.
             </p>
           </div>
         </div>
@@ -77,7 +77,7 @@ export default function CrewAIComparisonPage() {
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
                 <th className="text-left px-5 py-3 font-semibold text-gray-700">Feature</th>
-                <th className="text-center px-5 py-3 font-semibold text-red-600">Synkora</th>
+                <th className="text-center px-5 py-3 font-semibold text-red-600">Katexs</th>
                 <th className="text-center px-5 py-3 font-semibold text-gray-700">CrewAI</th>
               </tr>
             </thead>
@@ -85,7 +85,7 @@ export default function CrewAIComparisonPage() {
               {features.map((row, i) => (
                 <tr key={row.name} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}>
                   <td className="px-5 py-3 text-gray-700">{row.name}</td>
-                  <td className="px-5 py-3 text-center"><Cell value={row.synkora as 'yes' | 'no' | 'partial'} /></td>
+                  <td className="px-5 py-3 text-center"><Cell value={row.katexs as 'yes' | 'no' | 'partial'} /></td>
                   <td className="px-5 py-3 text-center"><Cell value={row.crewai as 'yes' | 'no' | 'partial'} /></td>
                 </tr>
               ))}
@@ -98,7 +98,7 @@ export default function CrewAIComparisonPage() {
 
         <div className="grid md:grid-cols-2 gap-8 mb-16">
           <div className="border border-red-200 rounded-xl p-6">
-            <h2 className="text-lg font-semibold text-red-700 mb-4">When to choose Synkora</h2>
+            <h2 className="text-lg font-semibold text-red-700 mb-4">When to choose Katexs</h2>
             <ul className="space-y-2 text-sm text-gray-700">
               <li className="flex gap-2"><Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />You need a web UI and no-config deployment for your team</li>
               <li className="flex gap-2"><Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />You need multi-tenant agent access across multiple workspaces</li>
@@ -119,8 +119,8 @@ export default function CrewAIComparisonPage() {
         </div>
 
         <div className="bg-gradient-to-r from-red-500 to-rose-600 rounded-2xl p-8 text-center text-white">
-          <h2 className="text-2xl font-bold mb-2">Try Synkora free</h2>
-          <p className="text-white/90 mb-6">Self-host in minutes or use Synkora Cloud. MIT licensed.</p>
+          <h2 className="text-2xl font-bold mb-2">Try Katexs free</h2>
+          <p className="text-white/90 mb-6">Self-host in minutes or use Katexs Cloud. MIT licensed.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link href="/signup" className="px-6 py-3 bg-white text-red-600 font-semibold rounded-xl hover:bg-gray-50 transition-colors">
               Get Started Free

@@ -61,7 +61,7 @@ class SecureTokenStorage {
     // Remove any legacy localStorage tokens left over from older versions
     if (typeof window !== 'undefined') {
       try {
-        ;['access_token', 'refresh_token', 'synkora_access', 'synkora_refresh', 'synkora_expires'].forEach(
+        ;['access_token', 'refresh_token', 'katexs_access', 'katexs_refresh', 'katexs_expires'].forEach(
           (k) => localStorage.removeItem(k)
         )
       } catch {
@@ -111,7 +111,7 @@ class SecureTokenStorage {
   migrateFromLocalStorage(): void {
     if (typeof window === 'undefined') return
     try {
-      ;['access_token', 'refresh_token', 'synkora_access', 'synkora_refresh', 'synkora_expires'].forEach(
+      ;['access_token', 'refresh_token', 'katexs_access', 'katexs_refresh', 'katexs_expires'].forEach(
         (k) => localStorage.removeItem(k)
       )
     } catch {

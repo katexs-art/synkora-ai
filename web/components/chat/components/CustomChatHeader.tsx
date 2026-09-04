@@ -24,8 +24,8 @@ export function CustomChatHeader({ agent, chatConfig, onClearChat, onRefresh }: 
   const headerBgColor = chatConfig?.chat_header_background_color || chatConfig?.chat_primary_color || '#10b981'
   const headerTextColor = chatConfig?.chat_header_text_color || '#ffffff'
   const showPoweredBy = chatConfig?.show_powered_by !== false
-  const poweredByText = chatConfig?.powered_by_text || 'Powered by Synkora'
-  const poweredByUrl = chatConfig?.powered_by_url || 'https://synkora.ai'
+  const poweredByText = chatConfig?.powered_by_text || 'Powered by Katexs'
+  const poweredByUrl = chatConfig?.powered_by_url || 'https://katexs.ai'
 
   return (
     <div 

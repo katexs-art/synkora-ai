@@ -153,7 +153,7 @@ export default function ProxyConfigsPage() {
     return `${config.api_key_prefix}...`
   }
 
-  const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.synkora.com'
+  const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.katexs.com'
   const activeConfigs = proxyConfigs.filter((config) => config.is_active).length
   const totalRequests = proxyConfigs.reduce((sum, config) => sum + config.usage_count, 0)
   const totalTokens = proxyConfigs.reduce((sum, config) => sum + config.total_tokens_generated, 0)
@@ -208,9 +208,9 @@ export default function ProxyConfigsPage() {
                 <Server className="h-6 w-6 text-[#171717]" />
               </div>
               <div className="flex-1">
-                <h2 className="text-lg font-semibold text-gray-950">Synkora proxy endpoints</h2>
+                <h2 className="text-lg font-semibold text-gray-950">Katexs proxy endpoints</h2>
                 <p className="mt-2 max-w-2xl text-sm leading-6 text-gray-600">
-                  Swap your live provider URL for a mock Synkora endpoint during load testing. Each config
+                  Swap your live provider URL for a mock Katexs endpoint during load testing. Each config
                   can model realistic latency, token volumes, and injected failures.
                 </p>
                 <div className="mt-5 space-y-3">
@@ -435,7 +435,7 @@ export default function ProxyConfigsPage() {
                     <div className="flex items-center justify-between border-t border-[#eadfce] pt-4">
                       <span className="text-xs text-gray-500">Created {formatDate(config.created_at)}</span>
                       <span className="text-xs font-medium text-[#7c5d45]">
-                        Synkora proxy profile
+                        Katexs proxy profile
                       </span>
                     </div>
                   </div>

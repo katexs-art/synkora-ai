@@ -105,7 +105,7 @@ export default function ExtensionAuthPage() {
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-500">
               <span className="text-sm font-bold text-white">S</span>
             </div>
-            <span className="text-sm font-semibold text-gray-800">Synkora</span>
+            <span className="text-sm font-semibold text-gray-800">Katexs</span>
           </div>
           <div className="text-center">
             <p className="mb-1 text-sm font-medium text-gray-800">Connecting browser extension</p>

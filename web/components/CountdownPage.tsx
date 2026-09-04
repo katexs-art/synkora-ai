@@ -132,7 +132,7 @@ export default function CountdownPage() {
             <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-rose-600 rounded-xl flex items-center justify-center">
               <Zap className="w-7 h-7 text-white" />
             </div>
-            <span className="text-3xl font-bold text-white">Synkora</span>
+            <span className="text-3xl font-bold text-white">Katexs</span>
           </div>
           <span className="text-gray-500 text-sm tracking-wide">No-Code AI Agent Platform</span>
         </div>

@@ -639,7 +639,7 @@ export default function SocialAuthConfigPage() {
                     <DashboardPagePanel className="p-12 text-center">
                       <div className="mx-auto mb-4 inline-flex h-14 w-14 items-center justify-center rounded-full bg-[#f3ecde]"><Plus size={28} className="text-[#171717]" /></div>
                       <h3 className="text-base font-semibold text-gray-900">No platform OAuth apps</h3>
-                      <p className="mt-2 text-sm text-gray-600 max-w-sm mx-auto">Add OAuth credentials to let tenants use Synkora-managed integrations.</p>
+                      <p className="mt-2 text-sm text-gray-600 max-w-sm mx-auto">Add OAuth credentials to let tenants use Katexs-managed integrations.</p>
                     </DashboardPagePanel>
                   )}
 
@@ -648,7 +648,7 @@ export default function SocialAuthConfigPage() {
                       <div className="rounded-full bg-[#f1eadc] p-2 flex-shrink-0"><ShieldCheck className="h-4 w-4 text-[#7c5d45]" /></div>
                       <div>
                         <p className="text-sm font-semibold text-gray-900">About Platform OAuth Apps</p>
-                        <p className="mt-1 text-xs leading-relaxed text-gray-500">Platform OAuth apps let tenants use Synkora-owned credentials. Client secrets are encrypted at rest and never exposed via API.</p>
+                        <p className="mt-1 text-xs leading-relaxed text-gray-500">Platform OAuth apps let tenants use Katexs-owned credentials. Client secrets are encrypted at rest and never exposed via API.</p>
                       </div>
                     </div>
                   </DashboardPagePanel>
@@ -753,7 +753,7 @@ export default function SocialAuthConfigPage() {
             <div className="sticky top-0 flex items-center justify-between border-b border-gray-100 bg-white px-6 py-4">
               <div>
                 <h3 className="text-base font-semibold text-gray-900">Add Platform OAuth App</h3>
-                <p className="text-xs text-gray-500 mt-0.5">Register a Synkora-owned OAuth app for tenant use</p>
+                <p className="text-xs text-gray-500 mt-0.5">Register a Katexs-owned OAuth app for tenant use</p>
               </div>
               <button onClick={() => setPlatformCreating(false)} className="rounded-lg p-2 text-gray-400 hover:bg-gray-100"><X size={18} /></button>
             </div>
@@ -776,7 +776,7 @@ export default function SocialAuthConfigPage() {
                 <div className="space-y-4">
                   <div>
                     <label className={labelCls}>App Name *</label>
-                    <input type="text" value={platformCreateForm.app_name} onChange={e => setPlatformCreateForm(f => ({ ...f, app_name: e.target.value }))} className={inputCls} placeholder="e.g. Synkora Gmail" />
+                    <input type="text" value={platformCreateForm.app_name} onChange={e => setPlatformCreateForm(f => ({ ...f, app_name: e.target.value }))} className={inputCls} placeholder="e.g. Katexs Gmail" />
                   </div>
                   <div>
                     <label className={labelCls}>Description</label>

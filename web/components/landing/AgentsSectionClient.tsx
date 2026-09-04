@@ -264,7 +264,7 @@ export default function AgentsSectionClient() {
 
         <div className="text-center mt-16">
           <Link
-            href="https://app.synkora.ai/signup"
+            href="https://app.katexs.ai/signup"
             className="group inline-flex items-center gap-3 rounded-full bg-[#191919] px-10 py-5 text-lg font-semibold text-[#f7f2e7] transition-transform hover:-translate-y-0.5"
           >
             <span>Start Building Free</span>

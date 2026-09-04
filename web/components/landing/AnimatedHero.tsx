@@ -304,7 +304,7 @@ export default function AnimatedHero({ stars }: { stars?: number | null }) {
               <span className="text-sm font-medium text-[#5f5a52]">MIT License</span>
               <span className="text-black/20">|</span>
               <a
-                href="https://github.com/getsynkora/synkora-ai"
+                href="https://github.com/getkatexs/katexs-ai"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-1.5 text-sm font-medium text-[#5f5a52] hover:text-[#3d3933]"
@@ -333,12 +333,12 @@ export default function AnimatedHero({ stars }: { stars?: number | null }) {
             </h1>
 
             <p className="hero-subtext mt-8 max-w-2xl text-xl leading-relaxed text-[#4f4a42]">
-              Build agents that connect to your data, deploy to Slack, WhatsApp, Teams, and your product - using your own OpenAI or Anthropic keys. Self-host for free or use Synkora Cloud.
+              Build agents that connect to your data, deploy to Slack, WhatsApp, Teams, and your product - using your own OpenAI or Anthropic keys. Self-host for free or use Katexs Cloud.
             </p>
 
             <div className="mt-10 flex flex-col items-start gap-4 sm:flex-row">
               <Link
-                href="https://app.synkora.ai/signup"
+                href="https://app.katexs.ai/signup"
                 className="hero-cta inline-flex w-full items-center justify-center rounded-full bg-[#191919] px-8 py-4 text-lg font-semibold text-[#f7f2e7] transition-transform hover:-translate-y-0.5 sm:w-auto"
               >
                 Start Building Free

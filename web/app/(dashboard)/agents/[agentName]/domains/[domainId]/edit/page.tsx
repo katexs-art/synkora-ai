@@ -203,7 +203,7 @@ export default function EditDomainPage() {
                       required
                     />
                     <p className="text-xs text-gray-500 mt-1">
-                      Required: A platform subdomain is always needed for fallback access and DNS mapping (e.g., myagent.synkora.ai)
+                      Required: A platform subdomain is always needed for fallback access and DNS mapping (e.g., myagent.katexs.ai)
                     </p>
                   </div>
                 </>

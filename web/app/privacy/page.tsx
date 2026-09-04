@@ -2,8 +2,8 @@ import Link from 'next/link'
 import PublicPageFrame from '@/components/public/PublicPageFrame'
 
 export const metadata = {
-  title: 'Privacy Policy – Synkora',
-  description: 'Synkora Privacy Policy. Explains how we collect, use, and protect data on the Synkora LLM platform. Self-hosted deployments give you full data control.',
+  title: 'Privacy Policy – Katexs',
+  description: 'Katexs Privacy Policy. Explains how we collect, use, and protect data on the Katexs LLM platform. Self-hosted deployments give you full data control.',
 }
 
 export default function PrivacyPolicyPage() {
@@ -30,7 +30,7 @@ export default function PrivacyPolicyPage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">1. Introduction</h2>
             <p className="text-gray-700 mb-4">
-              Welcome to Synkora. We respect your privacy and are committed to protecting your personal data. 
+              Welcome to Katexs. We respect your privacy and are committed to protecting your personal data. 
               This privacy policy will inform you about how we handle your personal data when you use our 
               platform and tell you about your privacy rights.
             </p>
@@ -135,8 +135,8 @@ export default function PrivacyPolicyPage() {
             </ul>
             <p className="text-gray-700 mb-4">
               To exercise these rights, please contact us at{' '}
-              <a href="mailto:privacy@synkora.ai" className="text-primary-500 hover:text-primary-600">
-                privacy@synkora.ai
+              <a href="mailto:privacy@katexs.ai" className="text-primary-500 hover:text-primary-600">
+                privacy@katexs.ai
               </a>
             </p>
           </section>
@@ -190,10 +190,10 @@ export default function PrivacyPolicyPage() {
               If you have any questions about this Privacy Policy or our data practices, please contact us:
             </p>
             <p className="text-gray-700 mb-2">
-              Email: <a href="mailto:privacy@synkora.ai" className="text-primary-500 hover:text-primary-600">privacy@synkora.ai</a>
+              Email: <a href="mailto:privacy@katexs.ai" className="text-primary-500 hover:text-primary-600">privacy@katexs.ai</a>
             </p>
             <p className="text-gray-700">
-              Support: <a href="mailto:support@synkora.ai" className="text-primary-500 hover:text-primary-600">support@synkora.ai</a>
+              Support: <a href="mailto:support@katexs.ai" className="text-primary-500 hover:text-primary-600">support@katexs.ai</a>
             </p>
           </section>
 

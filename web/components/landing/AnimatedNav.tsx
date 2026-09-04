@@ -55,7 +55,7 @@ export default function AnimatedNav() {
             <Link href="/" className="inline-flex flex-col">
               <div className="flex items-center gap-3">
                 <span className="whitespace-nowrap text-[2rem] font-semibold leading-none tracking-[0.18em] text-[#141414] sm:text-[2.2rem]">
-                  SYNKORA
+                  KATEXS
                 </span>
                 <span className="rounded-full border border-black/10 bg-white/65 px-2.5 py-1 text-[10px] font-semibold uppercase leading-none tracking-[0.24em] text-[#5d564c]">
                   Beta
@@ -92,7 +92,7 @@ export default function AnimatedNav() {
 
           <div ref={actionsRef} className="flex items-center justify-end gap-3 sm:gap-4" style={{ opacity: 0 }}>
             <a
-              href="https://github.com/getsynkora/synkora-ai"
+              href="https://github.com/getkatexs/katexs-ai"
               target="_blank"
               rel="noopener noreferrer"
               className="hidden items-center gap-2 whitespace-nowrap rounded-full border border-black/10 bg-white/65 px-4 py-2.5 text-sm font-medium text-[#1d1a15] transition-colors hover:bg-white lg:inline-flex"

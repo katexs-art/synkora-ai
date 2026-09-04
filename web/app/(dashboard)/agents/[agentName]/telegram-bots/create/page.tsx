@@ -279,7 +279,7 @@ export default function CreateTelegramBotPage() {
                 className={fieldClass}
                 required
               />
-              <p className={helperTextClass}>A friendly name for this bot inside Synkora.</p>
+              <p className={helperTextClass}>A friendly name for this bot inside Katexs.</p>
             </div>
 
             <div className="border-t border-black/10 pt-5">

@@ -19,12 +19,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   if (!doc) {
     return {
-      title: 'Docs – Synkora',
+      title: 'Docs – Katexs',
     }
   }
 
   return {
-    title: `${doc.title} – Synkora Docs`,
+    title: `${doc.title} – Katexs Docs`,
     description: doc.description,
   }
 }

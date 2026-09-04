@@ -3,8 +3,8 @@ import { Zap, Shield, Lock, Key, Eye, Server, CheckCircle, AlertTriangle, Mail }
 import PublicPageFrame from '@/components/public/PublicPageFrame'
 
 export const metadata = {
-  title: 'Security – Synkora',
-  description: 'Synkora security practices: encryption, multi-tenancy isolation, vulnerability disclosure, and self-hosting for full infrastructure control.',
+  title: 'Security – Katexs',
+  description: 'Katexs security practices: encryption, multi-tenancy isolation, vulnerability disclosure, and self-hosting for full infrastructure control.',
 }
 
 export default function SecurityPage() {
@@ -17,7 +17,7 @@ export default function SecurityPage() {
             Security First
           </div>
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-            Security at Synkora
+            Security at Katexs
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
             We take security seriously. Learn about our security practices, how to report vulnerabilities,
@@ -37,15 +37,15 @@ export default function SecurityPage() {
               <div>
                 <h2 className="text-xl font-bold text-gray-900 mb-2">Report a Security Vulnerability</h2>
                 <p className="text-gray-600 mb-4">
-                  If you've discovered a security vulnerability in Synkora, please report it responsibly.
+                  If you've discovered a security vulnerability in Katexs, please report it responsibly.
                   <strong className="text-gray-900"> Do NOT create a public GitHub issue.</strong>
                 </p>
                 <a
-                  href="mailto:security@synkora.ai"
+                  href="mailto:security@katexs.ai"
                   className="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-xl transition-colors"
                 >
                   <Mail className="w-4 h-4" />
-                  security@synkora.ai
+                  security@katexs.ai
                 </a>
                 <p className="text-sm text-gray-500 mt-3">
                   We acknowledge reports within 48 hours and provide regular updates on progress.
@@ -129,7 +129,7 @@ export default function SecurityPage() {
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Security Best Practices</h2>
           <div className="prose prose-lg max-w-none">
             <div className="bg-gray-50 rounded-2xl p-8">
-              <h3 className="text-xl font-bold text-gray-900 mb-4">When Using Synkora</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-4">When Using Katexs</h3>
               <ul className="space-y-3">
                 {[
                   'Keep dependencies updated to the latest secure versions',

@@ -92,7 +92,7 @@ export function ConnectAgentModal({ isOpen, onClose, shareToken, topic }: Connec
   // --- Node.js ---
   const nodeScript = `#!/usr/bin/env node
 /**
- * Synkora War Room — Node.js Agent
+ * Katexs War Room — Node.js Agent
  * Topic: ${topic}
  *
  * Usage:
@@ -172,7 +172,7 @@ ${provider === 'anthropic' ? `
 
 async function main() {
   console.log("=".repeat(50));
-  console.log(\`Synkora War Room Agent | \${AGENT_NAME} | \${MODEL}\`);
+  console.log(\`Katexs War Room Agent | \${AGENT_NAME} | \${MODEL}\`);
   console.log("=".repeat(50));
 
   const { participantId, totalRounds } = await joinDebate();
@@ -212,7 +212,7 @@ main().catch(console.error);`
 
   // --- Shell ---
   const shellScript = `#!/bin/bash
-# Synkora War Room — Shell Agent
+# Katexs War Room — Shell Agent
 # Topic: ${topic}
 # This script joins a debate and submits static responses.
 # Edit the RESPONSE variable for each round.

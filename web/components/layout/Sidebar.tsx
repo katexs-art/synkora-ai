@@ -332,7 +332,16 @@ interface SidebarProps {
 
 export function Sidebar({ mobileOpen = false, onMobileClose }: SidebarProps) {
   const [isExpanded, setIsExpanded] = useState(false)
-  const [isPinned, setIsPinned] = useState(false)
+  const [isPinned, setIsPinned] = useState(true)
+  const [logoUrl, setLogoUrl] = useState<string | null>(null)
+  useEffect(() => {
+    const apply = (e: Event) => {
+      const d = (e as CustomEvent).detail
+      if (d && d.platform_logo_url) setLogoUrl(d.platform_logo_url)
+    }
+    window.addEventListener('katexs:branding', apply)
+    return () => window.removeEventListener('katexs:branding', apply)
+  }, [])
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({})
   const pathname = usePathname()
   const user = useAuthStore((state) => state.user)
@@ -488,7 +497,7 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: SidebarProps) {
       {/* Sidebar panel */}
       <div
         className={cn(
-          'h-screen flex flex-col border-r border-white/8 bg-[#111111] py-6 shadow-[0_24px_60px_rgba(0,0,0,0.28)] transition-all duration-300 flex-shrink-0',
+          'h-screen flex flex-col border-r border-white/8 bg-[#000000] py-6 shadow-[0_24px_60px_rgba(0,0,0,0.28)] transition-all duration-300 flex-shrink-0',
           // Mobile: fixed overlay; desktop: static in flex flow
           'fixed inset-y-0 left-0 z-50 md:relative md:inset-y-auto md:left-auto md:z-auto',
           // Mobile slide animation; desktop always visible
@@ -504,20 +513,14 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: SidebarProps) {
         <div className="mb-8 px-5">
           <div className={cn('flex items-center', showLabels ? 'justify-between' : 'justify-center')}>
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[#f7f2e7] text-[#111111] shadow-[0_8px_24px_rgba(0,0,0,0.24)]">
-                <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              {showLabels && (
-                <div className="flex flex-col">
-                  <div className="flex items-center gap-3">
-                    <span className="whitespace-nowrap text-[1.35rem] font-semibold uppercase tracking-[0.18em] text-[#f7f2e7]">
-                      SYNKORA
-                    </span>
-                    <span className="rounded-full border border-white/10 bg-white/[0.08] px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.2em] text-[#d2cabf]">Beta</span>
-                  </div>
-                  <span className="mt-1 text-[10px] uppercase tracking-[0.22em] text-[#857d70]">Enterprise platform</span>
+              {showLabels ? (
+                <div className="flex h-9 items-center">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={logoUrl || '/logo-transparent.png'} alt="Katexs" className="h-9 w-auto object-contain" />
+                </div>
+              ) : (
+                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-white text-[#111111] shadow-[0_8px_24px_rgba(0,0,0,0.35)]">
+                  <span className="text-base font-bold">K</span>
                 </div>
               )}
             </div>

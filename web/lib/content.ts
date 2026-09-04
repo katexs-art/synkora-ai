@@ -352,7 +352,7 @@ export async function getAllBlogPosts(): Promise<BlogPost[]> {
         Array.isArray(data.authors) && data.authors.length > 0
           ? data.authors
               .map((authorKey) => authorsByKey[authorKey] || { key: authorKey, name: titleCase(authorKey) })
-          : [authorsByKey.synkora || { key: 'synkora', name: 'Synkora Team' }]
+          : [authorsByKey.katexs || { key: 'katexs', name: 'Katexs Team' }]
 
       const tags = Array.isArray(data.tags) ? data.tags : []
       const publishedAtMatch = fileName.match(/^(\d{4}-\d{2}-\d{2})-/)
@@ -505,7 +505,7 @@ export async function getAdjacentDocs(slugParts: string[]) {
       slugParts: [] as string[],
       href: '/docs',
       title: 'Welcome',
-      description: 'Overview of Synkora documentation',
+      description: 'Overview of Katexs documentation',
       section: 'overview',
       subgroup: null,
       order: 0,

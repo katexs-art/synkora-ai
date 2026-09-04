@@ -636,7 +636,7 @@ export default function HowItWorksPage() {
               Use Cases
             </div>
             <h2 className="text-3xl sm:text-5xl font-medium tracking-[-0.05em] text-white mb-4">Built for Every Use Case</h2>
-            <p className="text-base sm:text-xl text-[#c6bfb3]">See what you can build with Synkora</p>
+            <p className="text-base sm:text-xl text-[#c6bfb3]">See what you can build with Katexs</p>
           </div>
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
@@ -674,7 +674,7 @@ export default function HowItWorksPage() {
             Ready to Build Your First Agent?
               </h2>
               <p className="text-base sm:text-xl text-white/90 mb-8 sm:mb-10">
-            Join thousands of teams already using Synkora to automate their workflows.
+            Join thousands of teams already using Katexs to automate their workflows.
               </p>
               <Link
                 href="/signup"

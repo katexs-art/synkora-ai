@@ -1,0 +1,14 @@
+/* Katexs brand accent (light theme) — primary buttons/links follow --k-primary */
+:root {
+  --k-primary: #2563eb;   /* blue-600 */
+  --k-secondary: #0ea5e9;
+}
+body .bg-emerald-600 { background-color: var(--k-primary) !important; }
+body .bg-emerald-500 { background-color: var(--k-primary) !important; }
+body .hover\:bg-emerald-700:hover { background-color: color-mix(in srgb, var(--k-primary) 82%, black) !important; }
+body .hover\:bg-emerald-600:hover { background-color: color-mix(in srgb, var(--k-primary) 90%, black) !important; }
+body .text-emerald-600 { color: var(--k-primary) !important; }
+body .text-emerald-500 { color: var(--k-primary) !important; }
+body .border-emerald-500, body .border-emerald-600 { border-color: var(--k-primary) !important; }
+body .focus\:ring-emerald-500:focus { --tw-ring-color: var(--k-primary) !important; }
+body .bg-emerald-50 { background-color: color-mix(in srgb, var(--k-primary) 10%, white) !important; }

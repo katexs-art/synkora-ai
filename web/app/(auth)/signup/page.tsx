@@ -131,7 +131,7 @@ export default function SignUpPage() {
             <div className="mb-8">
               <div className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/55 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#6e675d]">
                 <Sparkles className="h-3.5 w-3.5 text-[#2d8b69]" />
-                Build on Synkora
+                Build on Katexs
               </div>
               <h1 className="mt-5 text-3xl font-semibold tracking-tight text-gray-900 sm:text-5xl">
                 Create your platform workspace
@@ -407,7 +407,7 @@ export default function SignUpPage() {
               ))}
             </div>
             <p className="mb-4 leading-relaxed text-white/90">
-              &quot;Synkora gave us a single platform for agents, retrieval, and delivery. We went from disconnected experiments to a real product stack.&quot;
+              &quot;Katexs gave us a single platform for agents, retrieval, and delivery. We went from disconnected experiments to a real product stack.&quot;
             </p>
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#7de5c1] font-bold text-[#101915]">
