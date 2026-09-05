@@ -1087,10 +1087,9 @@ async def voice_preview(voice_id: str, provider: str = "11labs", text: str | Non
     sample_text = text or "Hi, I'm your AI voice agent from Katexs. How can I help you today?"
     if len(sample_text) > 400:
         raise HTTPException(status_code=400, detail="Text too long (max 400 chars)")
-    if not text:
-        cache = _voice_preview_cache_path(provider, voice_id)
-        if _os.path.exists(cache) and (_os.path.getmtime(cache) > _os.path.getmtime(__file__) - 7 * 86400):
-            return FastResponse(open(cache, "rb").read(), media_type="audio/mpeg", headers={"Cache-Control": "public, max-age=604800"})
+    cache = _voice_preview_cache_path(provider, voice_id)
+    if not text and _os.path.exists(cache) and (_os.path.getmtime(cache) > _os.path.getmtime(__file__) - 7 * 86400):
+        return FastResponse(open(cache, "rb").read(), media_type="audio/mpeg", headers={"Cache-Control": "public, max-age=604800"})
     audio = None
 
     if provider == "openai":
@@ -1122,8 +1121,9 @@ async def voice_preview(voice_id: str, provider: str = "11labs", text: str | Non
     else:
         raise HTTPException(status_code=501, detail=f"Preview synthesis not supported yet for provider '{provider}'. Pick ElevenLabs or OpenAI to hear samples.")
 
-    with open(cache, "wb") as f:
-        f.write(audio)
+    if not text:
+        with open(cache, "wb") as f:
+            f.write(audio)
     return FastResponse(audio, media_type="audio/mpeg", headers={"Cache-Control": "public, max-age=604800"})
 
 
