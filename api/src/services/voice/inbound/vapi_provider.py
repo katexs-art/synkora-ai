@@ -258,6 +258,37 @@ class VapiProvider(BaseInboundCallProvider):
             phone_call.cost_cents = int(float(cost) * 100)
         phone_call.call_metadata = {"ended_reason": ended_reason}
 
+        # ---- Katexs voice minute metering (billable usage) ----
+        try:
+            minutes = 0
+            if duration_seconds is not None:
+                minutes = max(1, (int(duration_seconds) + 59) // 60)
+            if minutes and phone_call.tenant_id:
+                from sqlalchemy import text as _t
+                # credit_balances: 1 credit == 1 billable voice minute
+                await db.execute(
+                    _t(
+                        "INSERT INTO credit_balances (id, tenant_id, total_credits, used_credits, available_credits, created_at, updated_at) "
+                        "VALUES (gen_random_uuid(), :t, 0, 0, 0, now(), now()) "
+                        "ON CONFLICT (tenant_id) DO NOTHING"
+                    ),
+                    {"t": str(phone_call.tenant_id)},
+                )
+                await db.execute(
+                    _t("UPDATE credit_balances SET used_credits = used_credits + :m, available_credits = GREATEST(total_credits - used_credits - :m, 0), updated_at = now() WHERE tenant_id = :t"),
+                    {"m": minutes, "t": str(phone_call.tenant_id)},
+                )
+                await db.execute(
+                    _t(
+                        "INSERT INTO voice_usage (id, agent_id, tenant_id, provider, operation_type, cost, created_at, updated_at) "
+                        "VALUES (gen_random_uuid(), :a, :t, 'vapi', 'phone_call', :c, now(), now())"
+                    ),
+                    {"a": str(phone_call.agent_id), "t": str(phone_call.tenant_id), "c": (phone_call.cost_cents or 0) / 100.0},
+                )
+                logger.info(f"Voice metering: call={vapi_call_id} minutes={minutes} tenant={phone_call.tenant_id}")
+        except Exception as e:
+            logger.error(f"Voice metering failed for call={vapi_call_id}: {e}")
+
         # Save full transcript as messages if conversation exists
         _role_map = {"user": MessageRole.USER, "assistant": MessageRole.ASSISTANT}
         if phone_call.conversation_id and isinstance(full_transcript, list):

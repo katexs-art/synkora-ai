@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'next/navigation'
-import { Phone, Save, RefreshCw, Key, ChevronDown, ChevronUp, Cable } from 'lucide-react'
+import { Phone, Save, RefreshCw, Key, ChevronDown, ChevronUp, Cable, Play, Volume2, PhoneCall, ShoppingCart, X } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { apiClient } from '@/lib/api/client'
 import { saveVapiCredential, checkCredential } from '@/lib/api/phone'
@@ -69,6 +69,14 @@ export default function VoiceStudioPage() {
   const [summaryEnabled, setSummaryEnabled] = useState(false)
   const [structuredEnabled, setStructuredEnabled] = useState(false)
 
+  // samples / test-call / billing
+  const [previewing, setPreviewing] = useState(false)
+  const [testOpen, setTestOpen] = useState(false)
+  const [testNumber, setTestNumber] = useState('')
+  const [testCalling, setTestCalling] = useState(false)
+  const [billing, setBilling] = useState<any>(null)
+  const [buying, setBuying] = useState<number | null>(null)
+
   useEffect(() => {
     load()
   }, [slug])
@@ -81,6 +89,7 @@ export default function VoiceStudioPage() {
         checkCredential('vapi').catch(() => ({ configured: false })),
       ])
       setVapiCredConfigured(!!cred?.configured)
+      setBilling(await apiClient.request('GET', `/api/v1/katexs/voice-billing`).catch(() => null))
       if (!vc || !vc.success) {
         setProvisioned(false)
         return
@@ -131,6 +140,54 @@ export default function VoiceStudioPage() {
 
   const llmModels = catalog.models[llmProvider] || []
   const sttModels = catalog.transcribers[sttProvider] || ['nova-2']
+
+  async function playSample() {
+    if (previewing) return
+    setPreviewing(true)
+    try {
+      const resp = await apiClient.axios.get(`/api/v1/katexs/voice-preview?provider=${encodeURIComponent(voiceProvider)}&voice_id=${encodeURIComponent(voiceId)}`, { responseType: 'blob' })
+      const blob = resp.data as Blob
+      const url = URL.createObjectURL(blob)
+      const audio = new Audio(url)
+      audio.onended = () => { setPreviewing(false); URL.revokeObjectURL(url) }
+      audio.onerror = () => { setPreviewing(false); toast.error('Sample unavailable — TTS key not configured yet') }
+      await audio.play()
+    } catch (e: any) {
+      setPreviewing(false)
+      toast.error(e?.message || 'Sample unavailable — TTS key not configured yet')
+    }
+  }
+
+  async function startTestCall() {
+    if (!testNumber.trim()) return
+    setTestCalling(true)
+    try {
+      const res = await apiClient.request('POST', `/api/v1/katexs/voice-assistant/${slug}/test-call`, { customer_number: testNumber.trim() })
+      setTestOpen(false)
+      setTestNumber('')
+      toast.success(`Calling ${res.calling} from ${res.from || 'your agent number'} — pick up!`)
+    } catch (e: any) {
+      toast.error(e?.message || 'Test call failed')
+    } finally {
+      setTestCalling(false)
+    }
+  }
+
+  async function buyMinutes(minutes: number) {
+    setBuying(minutes)
+    try {
+      const res = await apiClient.request('POST', `/api/v1/katexs/voice-topup`, { minutes })
+      if (res?.checkout_url) {
+        window.open(res.checkout_url, '_blank')
+      } else {
+        toast(res?.message || 'Checkout is being enabled — quote ready', { icon: '🧾' })
+      }
+    } catch (e: any) {
+      toast.error(e?.message || 'Purchase failed')
+    } finally {
+      setBuying(null)
+    }
+  }
 
   async function handleSaveVapiKey() {
     if (!vapiKey.trim()) return
@@ -209,12 +266,22 @@ export default function VoiceStudioPage() {
       icon={Phone}
       badge="Voice"
       actions={
-        <button
-          onClick={load}
-          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-        >
-          <RefreshCw className="w-4 h-4" /> Refresh from live
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setTestOpen(true)}
+            disabled={!provisioned}
+            title={provisioned ? 'Ring your phone with this agent' : 'Provision the assistant first'}
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-bold text-white bg-emerald-600 rounded-lg disabled:opacity-40 hover:bg-emerald-700 transition-colors"
+          >
+            <PhoneCall className="w-4 h-4" /> Test agent
+          </button>
+          <button
+            onClick={load}
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            <RefreshCw className="w-4 h-4" /> Refresh from live
+          </button>
+        </div>
       }
     >
       <div className="space-y-6">
@@ -344,20 +411,31 @@ export default function VoiceStudioPage() {
               <div className="space-y-2">
                 <label className={labelCls}>Voice provider</label>
                 <select value={voiceProvider} onChange={(e) => { setVoiceProvider(e.target.value); const first = catalog.voices.find((v) => v.provider === e.target.value); if (first) setVoiceId(first.voiceId) }} className={fieldCls}>
-                  {(catalog.voice_providers.length ? catalog.voice_providers : [{ value: '11labs', label: 'ElevenLabs' }]).map((p) => (
+                  {(catalog.voice_providers.length ? catalog.voice_providers : [{ value: '11labs', label: 'ElevenLabs' }, { value: 'openai', label: 'OpenAI' }]).map((p) => (
                     <option key={p.value} value={p.value}>{p.label}</option>
                   ))}
                 </select>
               </div>
               <div className="space-y-2">
                 <label className={labelCls}>Voice</label>
-                <select value={voiceId} onChange={(e) => setVoiceId(e.target.value)} className={fieldCls}>
-                  {voicesForProvider.map((v) => (
-                    <option key={v.voiceId} value={v.voiceId}>{v.name}{v.language ? ` (${v.language})` : ''} — {v.voiceId.slice(0, 8)}…</option>
-                  ))}
-                  {voiceId && !voicesForProvider.some((v) => v.voiceId === voiceId) && <option value={voiceId}>{voiceId} (custom)</option>}
-                </select>
-                <p className={hintCls}>Voice catalog loads from the connected Vapi account. You can paste any voice ID (e.g. ElevenLabs) for a custom voice.</p>
+                <div className="flex gap-2">
+                  <select value={voiceId} onChange={(e) => setVoiceId(e.target.value)} className={fieldCls}>
+                    {voicesForProvider.map((v) => (
+                      <option key={v.voiceId} value={v.voiceId}>{v.name}{v.language ? ` (${v.language})` : ''} — {v.voiceId.slice(0, 8)}…</option>
+                    ))}
+                    {voiceId && !voicesForProvider.some((v) => v.voiceId === voiceId) && <option value={voiceId}>{voiceId} (custom)</option>}
+                  </select>
+                  <button
+                    onClick={playSample}
+                    disabled={previewing}
+                    title="Play voice sample"
+                    className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold text-gray-700 bg-gray-100 border border-gray-200 rounded-lg hover:bg-gray-200 disabled:opacity-50 transition-colors whitespace-nowrap"
+                  >
+                    {previewing ? <Volume2 className="w-4 h-4 animate-pulse" /> : <Play className="w-4 h-4" />}
+                    {previewing ? 'Playing…' : 'Sample'}
+                  </button>
+                </div>
+                <p className={hintCls}>Hear the voice before you commit. Custom voice IDs (e.g. ElevenLabs) also work.</p>
               </div>
             </div>
             <div className="grid md:grid-cols-3 gap-4">
@@ -473,6 +551,44 @@ export default function VoiceStudioPage() {
           </div>
         </AgentPagePanel>
 
+        {/* Minutes & usage */}
+        {billing && (
+          <AgentPagePanel>
+            <div className="max-w-3xl p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-base font-bold text-gray-900 flex items-center gap-2"><ShoppingCart className="w-4 h-4 text-gray-400" /> Voice minutes</h2>
+                  <p className="text-xs text-gray-500 mt-1">Billed per minute at a flat rate — no surprise fees. Unused minutes never expire.</p>
+                </div>
+                <div className="text-right">
+                  <div className="text-2xl font-extrabold text-gray-900">{billing.minutes?.available?.toLocaleString() ?? '—'}</div>
+                  <div className="text-xs text-gray-500">minutes available</div>
+                </div>
+              </div>
+              <div className="grid md:grid-cols-4 gap-3 mt-5">
+                {(billing.packs || []).map((p: any) => (
+                  <button
+                    key={p.minutes}
+                    onClick={() => buyMinutes(p.minutes)}
+                    disabled={buying !== null}
+                    className="rounded-xl border border-gray-200 bg-gray-50 hover:bg-emerald-50 hover:border-emerald-300 transition-colors p-4 text-left disabled:opacity-50"
+                  >
+                    <div className="text-lg font-extrabold text-gray-900">{p.minutes.toLocaleString()} min</div>
+                    <div className="text-sm text-emerald-700 font-semibold mt-0.5">${(p.price_cents / 100).toFixed(2)}</div>
+                    <div className="text-[11px] text-gray-400 mt-1">${(p.price_cents / 100 / p.minutes).toFixed(2)}/min</div>
+                  </button>
+                ))}
+              </div>
+              {buying !== null && <p className="text-xs text-gray-500 mt-3">{buying.toLocaleString()} min purchase…</p>}
+              {!billing.stripe_enabled && (
+                <p className="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mt-4">
+                  Payments are being enabled — your quote is ready and minutes activate the moment checkout goes live.
+                </p>
+              )}
+            </div>
+          </AgentPagePanel>
+        )}
+
         {/* Raw JSON */}
         {raw && (
           <AgentPagePanel>
@@ -502,6 +618,38 @@ export default function VoiceStudioPage() {
           </button>
         </div>
       </div>
+
+      {/* Test-call modal */}
+      {testOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2"><PhoneCall className="w-5 h-5 text-emerald-600" /> Test this agent</h3>
+              <button onClick={() => setTestOpen(false)} className="text-gray-400 hover:text-gray-600"><X className="w-5 h-5" /></button>
+            </div>
+            <p className="text-sm text-gray-600 mb-4">
+              Enter your phone number — the agent will call you from its number so you can have a real conversation with the live build.
+            </p>
+            <input
+              type="tel"
+              value={testNumber}
+              onChange={(e) => setTestNumber(e.target.value)}
+              placeholder="+14155551234"
+              autoFocus
+              className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+            />
+            <button
+              onClick={startTestCall}
+              disabled={!testNumber.trim() || testCalling}
+              className="mt-4 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-bold text-white bg-emerald-600 rounded-lg disabled:opacity-50 hover:bg-emerald-700 transition-colors"
+            >
+              <PhoneCall className="w-4 h-4" />
+              {testCalling ? 'Calling you…' : 'Call my phone'}
+            </button>
+            <p className="text-[11px] text-gray-400 mt-3 text-center">Uses the agent&apos;s attached phone number · standard call charges may apply</p>
+          </div>
+        </div>
+      )}
     </AgentPageShell>
   )
 }

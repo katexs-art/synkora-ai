@@ -748,8 +748,9 @@ async def _voice_catalog(db, tenant_id) -> list[dict]:
     except Exception:
         voices = []
     if not voices:
-        # curated fallback (common ElevenLabs voices)
+        # curated fallback catalog (covers providers even before users connect keys)
         voices = [
+            # ElevenLabs
             {"voiceId": "EXAVITQu4vr4xnSDxMaL", "name": "Rachel", "provider": "11labs", "language": "en"},
             {"voiceId": "21m00Tcm4TlvDq8ikWAM", "name": "Bella", "provider": "11labs", "language": "en"},
             {"voiceId": "onwK4e9ZLuTAKqWW03F9", "name": "Domi", "provider": "11labs", "language": "en"},
@@ -757,9 +758,29 @@ async def _voice_catalog(db, tenant_id) -> list[dict]:
             {"voiceId": "VR6AewLTigWG4xSOukaG", "name": "Arnold", "provider": "11labs", "language": "en"},
             {"voiceId": "pNInz6obpgDQGcFmaJgB", "name": "Adam", "provider": "11labs", "language": "en"},
             {"voiceId": "yoZ06aMxZJJ28mfd3POQ", "name": "Sam", "provider": "11labs", "language": "en"},
+            {"voiceId": "jBpfuIE2acCO8z3wKNLl", "name": "Gigi", "provider": "11labs", "language": "en"},
+            {"voiceId": "cgSgspJ2msm6clMCkdW9", "name": "Jessica", "provider": "11labs", "language": "en"},
+            {"voiceId": "iP95p4xoKVk53GoZ742B", "name": "Chris", "provider": "11labs", "language": "en"},
+            {"voiceId": "nPczCjzmy2RZSJ5utkTA", "name": "Daniel", "provider": "11labs", "language": "en"},
+            {"voiceId": "XUeQJ7N7CJ0V4VfHn5nN", "name": "Grace", "provider": "11labs", "language": "en"},
+            {"voiceId": "8rHn0g2vWzQ5aXkL9mBp", "name": "Sarah", "provider": "11labs", "language": "en"},
+            {"voiceId": "pqHfZKP75CvOlQylNhV4", "name": "Bill", "provider": "11labs", "language": "en"},
+            {"voiceId": "flq6f7yk4E4fJM5XTYuZ", "name": "Michael", "provider": "11labs", "language": "en"},
+            {"voiceId": "zrHiDhphv9ZnV2qEzyhW", "name": "Judy", "provider": "11labs", "language": "en"},
+            {"voiceId": "K6aYv9s8Yc7O6mWxQz3D", "name": "Alex", "provider": "11labs", "language": "en"},
+            # OpenAI
+            {"voiceId": "alloy", "name": "Alloy (Neutral)", "provider": "openai", "language": "en"},
+            {"voiceId": "echo", "name": "Echo (Male)", "provider": "openai", "language": "en"},
+            {"voiceId": "fable", "name": "Fable (British)", "provider": "openai", "language": "en"},
+            {"voiceId": "onyx", "name": "Onyx (Deep Male)", "provider": "openai", "language": "en"},
+            {"voiceId": "nova", "name": "Nova (Female)", "provider": "openai", "language": "en"},
+            {"voiceId": "shimmer", "name": "Shimmer (Soft Female)", "provider": "openai", "language": "en"},
+            # Deepgram
+            {"voiceId": "aura-asteria-en", "name": "Asteria (Female)", "provider": "deepgram", "language": "en"},
+            {"voiceId": "aura-orion-en", "name": "Orion (Male)", "provider": "deepgram", "language": "en"},
+            {"voiceId": "aura-luna-en", "name": "Luna (Female)", "provider": "deepgram", "language": "en"},
+            {"voiceId": "aura-arcas-en", "name": "Arcas (Male)", "provider": "deepgram", "language": "en"},
         ]
-    _VOICE_CACHE["ts"] = now
-    _VOICE_CACHE["voices"] = voices
     return voices
 
 
@@ -1022,3 +1043,193 @@ async def update_voice_assistant(
     await db.commit()
 
     return {"success": True, "assistant_id": assistant_id, "updated": True, "message": "Voice assistant configuration synced to Vapi"}
+
+
+# ---------------------------------------------------------------------------
+# Voice previews, test calls, and minute billing (Katexs voice product)
+# ---------------------------------------------------------------------------
+
+VOICE_MINUTE_SELL_CENTS = 35  # sell price per voice minute (admin-tunable later)
+_PREVIEW_DIR = "/tmp/katexs-voice-previews"
+
+
+class TestCallRequest(BaseModel):
+    customer_number: str = Field(..., min_length=5, max_length=25, pattern=r"^\+?[0-9]{5,20}$")
+
+
+class VoiceTopupRequest(BaseModel):
+    minutes: int = Field(..., ge=30, le=100000)
+
+
+def _voice_preview_cache_path(provider: str, voice_id: str) -> str:
+    import hashlib
+    safe = hashlib.sha1(f"{provider}:{voice_id}".encode()).hexdigest()[:16]
+    return f"{_PREVIEW_DIR}/{safe}.mp3"
+
+
+@router.get("/voice-preview")
+async def voice_preview(voice_id: str, provider: str = "11labs"):
+    """Synthesize a short voice sample (MP3) for the voice picker."""
+    from fastapi import Response as FastResponse
+    import os as _os
+
+    os.makedirs(_PREVIEW_DIR, exist_ok=True)
+    cache = _voice_preview_cache_path(provider, voice_id)
+    if _os.path.exists(cache) and (_os.path.getmtime(cache) > _os.path.getmtime(__file__) - 7 * 86400):
+        return FastResponse(open(cache, "rb").read(), media_type="audio/mpeg", headers={"Cache-Control": "public, max-age=604800"})
+
+    sample_text = "Hi, I'm your AI voice agent from Katexs. How can I help you today?"
+    audio = None
+
+    if provider == "openai":
+        key = _os.environ.get("OPENAI_API_KEY")
+        if not key:
+            raise HTTPException(status_code=503, detail="Voice previews for OpenAI need a server OpenAI key (not configured).")
+        async with httpx.AsyncClient(timeout=30) as client:
+            resp = await client.post(
+                "https://api.openai.com/v1/audio/speech",
+                headers={"Authorization": f"Bearer {key}"},
+                json={"model": "tts-1", "voice": voice_id, "input": sample_text, "response_format": "mp3"},
+            )
+        if resp.status_code != 200:
+            raise HTTPException(status_code=502, detail=f"OpenAI TTS failed: {resp.text[:200]}")
+        audio = resp.content
+    elif provider == "11labs":
+        key = _os.environ.get("ELEVENLABS_API_KEY")
+        if not key:
+            raise HTTPException(status_code=503, detail="ElevenLabs previews need the Katexs ElevenLabs API key (not configured yet).")
+        async with httpx.AsyncClient(timeout=30) as client:
+            resp = await client.post(
+                f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}",
+                headers={"xi-api-key": key, "Content-Type": "application/json"},
+                json={"text": sample_text, "model_id": "eleven_turbo_v2_5", "voice_settings": {"stability": 0.5, "similarity_boost": 0.75}},
+            )
+        if resp.status_code != 200:
+            raise HTTPException(status_code=502, detail=f"ElevenLabs TTS failed: {resp.text[:200]}")
+        audio = resp.content
+    else:
+        raise HTTPException(status_code=501, detail=f"Preview synthesis not supported yet for provider '{provider}'. Pick ElevenLabs or OpenAI to hear samples.")
+
+    with open(cache, "wb") as f:
+        f.write(audio)
+    return FastResponse(audio, media_type="audio/mpeg", headers={"Cache-Control": "public, max-age=604800"})
+
+
+@router.post("/voice-assistant/{agent_key}/test-call")
+async def voice_test_call(
+    agent_key: str,
+    body: TestCallRequest,
+    tenant_id: uuid.UUID = Depends(get_current_tenant_id),
+    db: AsyncSession = Depends(get_async_db),
+):
+    """Ring a phone from the agent's number so the user can test the live agent."""
+    from src.models.phone_number import PhoneNumber
+
+    agent = await _resolve_agent(db, tenant_id, agent_key)
+    pc = agent.phone_config or {}
+    assistant_id = pc.get("vapi_assistant_id") or ""
+    if not assistant_id:
+        raise HTTPException(status_code=400, detail="Agent has no voice assistant provisioned yet.")
+
+    num_res = await db.execute(
+        select(PhoneNumber).filter(PhoneNumber.agent_id == agent.id, PhoneNumber.is_active == True)  # noqa: E712
+    )
+    phone = num_res.scalars().first()
+    provider_number_id = (phone.provider_number_id if phone else None) or ""
+    if not provider_number_id:
+        raise HTTPException(status_code=400, detail="Agent has no phone number attached. Add one in Phone settings first.")
+
+    key = await _katexs_vapi_key(db, tenant_id)
+    async with httpx.AsyncClient(timeout=25) as client:
+        resp = await client.post(
+            "https://api.vapi.ai/call",
+            headers={"Authorization": f"Bearer {key}"},
+            json={"assistantId": assistant_id, "phoneNumberId": provider_number_id, "customer": {"number": body.customer_number}},
+        )
+    if resp.status_code not in (200, 201, 202):
+        raise HTTPException(status_code=502, detail=f"Test call failed ({resp.status_code}): {resp.text[:250]}")
+    data = resp.json()
+    return {"success": True, "call_id": data.get("id"), "status": data.get("status", "queued"), "calling": body.customer_number, "from": phone.phone_number if phone else ""}
+
+
+@router.get("/voice-billing")
+async def voice_billing(
+    tenant_id: uuid.UUID = Depends(get_current_tenant_id),
+    db: AsyncSession = Depends(get_async_db),
+):
+    """Minutes balance + spend for the tenant."""
+    from sqlalchemy import text as sqltext
+
+    row = (await db.execute(sqltext("SELECT total_credits, used_credits, available_credits FROM credit_balances WHERE tenant_id = :t"), {"t": str(tenant_id)})).fetchone()
+    total = int(row[0]) if row else 0
+    used = int(row[1]) if row else 0
+    available = int(row[2]) if row else 0
+    stripe_enabled = bool(os.environ.get("STRIPE_SECRET_KEY"))
+    return {
+        "success": True,
+        "currency": "usd",
+        "sell_price_per_min_cents": VOICE_MINUTE_SELL_CENTS,
+        "minutes": {"total": total, "used": used, "available": available},
+        "stripe_enabled": stripe_enabled,
+        "packs": [
+            {"minutes": 100, "price_cents": 3500},
+            {"minutes": 500, "price_cents": 15750},
+            {"minutes": 1000, "price_cents": 28000},
+            {"minutes": 5000, "price_cents": 122500},
+        ],
+    }
+
+
+@router.post("/voice-topup")
+async def voice_topup(
+    body: VoiceTopupRequest,
+    tenant_id: uuid.UUID = Depends(get_current_tenant_id),
+    db: AsyncSession = Depends(get_async_db),
+):
+    """Purchase voice minutes. Stripe checkout when configured; quote otherwise."""
+    import secrets as _secrets
+    from sqlalchemy import text as sqltext
+
+    secret_key = os.environ.get("STRIPE_SECRET_KEY")
+    amount_cents = body.minutes * VOICE_MINUTE_SELL_CENTS
+    if not secret_key:
+        return {
+            "success": True,
+            "checkout_url": None,
+            "stripe_enabled": False,
+            "message": "Payments are being enabled — quote below. Minutes activate the moment checkout goes live.",
+            "quote": {"minutes": body.minutes, "amount_cents": amount_cents},
+        }
+
+    import uuid as _uuid
+    topup_id = str(_uuid.uuid4())
+    await db.execute(
+        sqltext(
+            "INSERT INTO credit_topups (id, tenant_id, credits, amount, status, payment_provider, created_at, updated_at) "
+            "VALUES (:id, :t, :credits, :amount, 'pending', 'stripe', now(), now())"
+        ),
+        {"id": topup_id, "t": str(tenant_id), "credits": body.minutes, "amount": amount_cents / 100.0},
+    )
+    await db.commit()
+
+    try:
+        import stripe as stripe_lib
+        stripe_lib.api_key = secret_key
+        session = stripe_lib.checkout.Session.create(
+            mode="payment",
+            success_url=f"{APP_URL}/voice?purchase=success",
+            cancel_url=f"{APP_URL}/voice?purchase=cancelled",
+            line_items=[{
+                "price_data": {
+                    "currency": "usd",
+                    "product_data": {"name": f"Katexs Voice Minutes — {body.minutes} min"},
+                    "unit_amount": amount_cents,
+                },
+                "quantity": 1,
+            }],
+            metadata={"topup_id": topup_id, "tenant_id": str(tenant_id), "kind": "voice_minutes"},
+            client_reference_id=str(tenant_id),
+        )
+        return {"success": True, "checkout_url": session.url, "stripe_enabled": True, "quote": {"minutes": body.minutes, "amount_cents": amount_cents}}
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"Checkout creation failed: {str(e)[:200]}")
