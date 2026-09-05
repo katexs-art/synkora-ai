@@ -49,7 +49,7 @@ export default function VoicePage() {
       <div className="mb-8 flex items-end justify-between">
         <div>
           <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight">Voice Agents</h1>
-          <p className="mt-2 text-gray-600">Phone agents powered by Vapi — calls, numbers and provisioning.</p>
+          <p className="mt-2 text-gray-600">Phone agents powered by Katexs — calls, numbers and provisioning.</p>
         </div>
         <Link href="/agents/new" className="px-5 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 text-sm font-semibold">
           + New voice agent
@@ -92,7 +92,7 @@ export default function VoicePage() {
                     {a.enabled ? 'Live' : 'Setup pending'}
                   </span>
                   <span className={`px-2 py-0.5 rounded-full text-[11px] font-bold uppercase ${a.phone_provisioned ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500'}`}>
-                    {a.phone_provisioned ? 'Vapi connected' : 'No number yet'}
+                    {a.phone_provisioned ? 'Katexs connected' : 'No number yet'}
                   </span>
                 </div>
                 {a.greeting && <p className="text-sm text-gray-500 mt-1 truncate">“{a.greeting}”</p>}
