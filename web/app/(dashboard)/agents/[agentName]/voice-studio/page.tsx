@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'next/navigation'
-import { Phone, Save, RefreshCw, Key, ChevronDown, ChevronUp, Cable, Play, Volume2, PhoneCall, ShoppingCart, X } from 'lucide-react'
+import { Phone, Save, RefreshCw, Key, ChevronDown, ChevronUp, Cable, Play, Volume2, PhoneCall, ShoppingCart, X, Mic, Square, Send } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { apiClient } from '@/lib/api/client'
 import { saveVapiCredential, checkCredential } from '@/lib/api/phone'
@@ -72,10 +72,19 @@ export default function VoiceStudioPage() {
   // samples / test-call / billing
   const [previewing, setPreviewing] = useState(false)
   const [testOpen, setTestOpen] = useState(false)
+  const [testTab, setTestTab] = useState<'talk' | 'phone'>('talk')
   const [testNumber, setTestNumber] = useState('')
   const [testCalling, setTestCalling] = useState(false)
   const [billing, setBilling] = useState<any>(null)
   const [buying, setBuying] = useState<number | null>(null)
+
+  // in-browser talk test
+  const [talkMsgs, setTalkMsgs] = useState<{ role: 'user' | 'agent'; text: string }[]>([])
+  const [talkBusy, setTalkBusy] = useState(false)
+  const [talkListening, setTalkListening] = useState(false)
+  const [talkInput, setTalkInput] = useState('')
+  const [convId, setConvId] = useState<string | null>(null)
+  const [recognition, setRecognition] = useState<any>(null)
 
   useEffect(() => {
     load()
@@ -210,6 +219,89 @@ export default function VoiceStudioPage() {
     } catch {
       toast.error('Failed to save Vapi API key')
     }
+  }
+
+  // ---------------- in-browser talk test ----------------
+  const micSupported = typeof window !== 'undefined' && !!((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition)
+
+  function speakText(text: string) {
+    return new Promise<void>((resolve) => {
+      apiClient.axios
+        .get(`/api/v1/katexs/voice-preview?provider=${encodeURIComponent(voiceProvider)}&voice_id=${encodeURIComponent(voiceId)}&text=${encodeURIComponent(text.slice(0, 380))}`, {
+          responseType: 'blob',
+          validateStatus: (st) => st === 200,
+        })
+        .then((resp) => {
+          const url = URL.createObjectURL(resp.data as Blob)
+          const audio = new Audio(url)
+          audio.onended = () => { URL.revokeObjectURL(url); resolve() }
+          audio.onerror = () => resolve()
+          audio.play().catch(() => resolve())
+        })
+        .catch(() => resolve())
+    })
+  }
+
+  async function talkSend(text: string) {
+    const trimmed = text.trim()
+    if (!trimmed || talkBusy) return
+    setTalkInput('')
+    setTalkMsgs((m) => [...m, { role: 'user', text: trimmed }])
+    setTalkBusy(true)
+    try {
+      const res = await apiClient.request('POST', `/api/v1/katexs/voice-assistant/${slug}/talk`, {
+        text: trimmed,
+        conversation_id: convId || undefined,
+      })
+      setConvId(res.conversation_id || convId)
+      const reply = res.reply || 'Sorry, I did not catch that.'
+      setTalkMsgs((m) => [...m, { role: 'agent', text: reply }])
+      await speakText(reply)
+    } catch (e: any) {
+      const detail = e?.response?.data?.detail || e?.message
+      setTalkMsgs((m) => [...m, { role: 'agent', text: typeof detail === 'string' ? detail : 'Connection failed' }])
+    } finally {
+      setTalkBusy(false)
+    }
+  }
+
+  function toggleMic() {
+    if (talkListening) {
+      recognition?.stop()
+      setTalkListening(false)
+      return
+    }
+    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+    if (!SR) {
+      toast.error('This browser has no speech recognition — type below instead')
+      return
+    }
+    const rec = new SR()
+    rec.lang = 'en-US'
+    rec.interimResults = false
+    rec.maxAlternatives = 1
+    rec.onresult = (ev: any) => {
+      const t = ev.results?.[0]?.[0]?.transcript
+      if (t) talkSend(t)
+    }
+    rec.onend = () => setTalkListening(false)
+    rec.onerror = () => setTalkListening(false)
+    setRecognition(rec)
+    setTalkListening(true)
+    try {
+      rec.start()
+    } catch {
+      setTalkListening(false)
+    }
+  }
+
+  function closeTalk() {
+    recognition?.stop()
+    setTalkListening(false)
+    setTestOpen(false)
+    setTalkMsgs([])
+    setConvId(null)
+    setTestNumber('')
   }
 
   async function handleSave() {
@@ -629,34 +721,98 @@ export default function VoiceStudioPage() {
         </div>
       </div>
 
-      {/* Test-call modal */}
+      {/* Test modal — browser talk (default) or phone call */}
       {testOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
-            <div className="flex items-center justify-between mb-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg flex flex-col max-h-[85vh]">
+            <div className="flex items-center justify-between px-6 pt-5 pb-3 border-b border-gray-100">
               <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2"><PhoneCall className="w-5 h-5 text-emerald-600" /> Test this agent</h3>
-              <button onClick={() => setTestOpen(false)} className="text-gray-400 hover:text-gray-600"><X className="w-5 h-5" /></button>
+              <button onClick={closeTalk} className="text-gray-400 hover:text-gray-600"><X className="w-5 h-5" /></button>
             </div>
-            <p className="text-sm text-gray-600 mb-4">
-              Enter your phone number — the agent will call you from its number so you can have a real conversation with the live build.
-            </p>
-            <input
-              type="tel"
-              value={testNumber}
-              onChange={(e) => setTestNumber(e.target.value)}
-              placeholder="+14155551234"
-              autoFocus
-              className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
-            />
-            <button
-              onClick={startTestCall}
-              disabled={!testNumber.trim() || testCalling}
-              className="mt-4 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-bold text-white bg-emerald-600 rounded-lg disabled:opacity-50 hover:bg-emerald-700 transition-colors"
-            >
-              <PhoneCall className="w-4 h-4" />
-              {testCalling ? 'Calling you…' : 'Call my phone'}
-            </button>
-            <p className="text-[11px] text-gray-400 mt-3 text-center">Uses the agent&apos;s attached phone number · standard call charges may apply</p>
+            <div className="flex gap-1 px-6 pt-4">
+              <button
+                onClick={() => setTestTab('talk')}
+                className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-colors ${testTab === 'talk' ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+              >
+                Talk in browser
+              </button>
+              <button
+                onClick={() => setTestTab('phone')}
+                disabled={!provisioned}
+                className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-40 ${testTab === 'phone' ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+              >
+                Call my phone
+              </button>
+            </div>
+
+            {testTab === 'talk' ? (
+              <div className="flex flex-col flex-1 min-h-0 p-6">
+                <p className="text-xs text-gray-500 mb-3">Talk to the live agent right here — no phone needed. Uses the agent&apos;s actual brain and its selected voice.</p>
+                <div className="flex-1 overflow-y-auto space-y-2 mb-4 min-h-[140px] max-h-64 bg-gray-50 rounded-xl p-3">
+                  {talkMsgs.length === 0 && (
+                    <p className="text-xs text-gray-400 text-center py-6">Press the mic and say hi — or type below.</p>
+                  )}
+                  {talkMsgs.map((m, i) => (
+                    <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                      <span className={`max-w-[85%] px-3 py-2 rounded-2xl text-sm whitespace-pre-wrap ${m.role === 'user' ? 'bg-emerald-600 text-white rounded-br-sm' : 'bg-white border border-gray-200 text-gray-800 rounded-bl-sm'}`}>
+                        {m.text}
+                      </span>
+                    </div>
+                  ))}
+                  {talkBusy && <p className="text-xs text-gray-400 animate-pulse text-center">agent is thinking…</p>}
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={toggleMic}
+                    disabled={talkBusy || !micSupported}
+                    title={micSupported ? (talkListening ? 'Stop listening' : 'Speak') : 'Speech not supported here'}
+                    className={`inline-flex items-center justify-center w-11 h-11 rounded-full transition-colors disabled:opacity-40 ${talkListening ? 'bg-red-500 text-white animate-pulse' : 'bg-gray-900 text-white hover:bg-gray-700'}`}
+                  >
+                    {talkListening ? <Square className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                  </button>
+                  <input
+                    value={talkInput}
+                    onChange={(e) => setTalkInput(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter') talkSend(talkInput) }}
+                    placeholder={micSupported ? '…or type a message' : 'Type your message here'}
+                    className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                  />
+                  <button
+                    onClick={() => talkSend(talkInput)}
+                    disabled={!talkInput.trim() || talkBusy}
+                    className="inline-flex items-center justify-center w-11 h-11 rounded-full bg-emerald-600 text-white disabled:opacity-40 hover:bg-emerald-700 transition-colors"
+                  >
+                    <Send className="w-4 h-4" />
+                  </button>
+                </div>
+                <p className="text-[11px] text-gray-400 mt-2">
+                  {talkListening ? 'Listening… speak now' : `Voice: ${voiceId.slice(0, 10)}… — replies are spoken with this voice`}
+                </p>
+              </div>
+            ) : (
+              <div className="p-6">
+                <p className="text-sm text-gray-600 mb-4">
+                  Enter your phone number — the agent will call you from its number so you can have a real conversation over the line.
+                </p>
+                <input
+                  type="tel"
+                  value={testNumber}
+                  onChange={(e) => setTestNumber(e.target.value)}
+                  placeholder="+14155551234"
+                  autoFocus
+                  className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                />
+                <button
+                  onClick={startTestCall}
+                  disabled={!testNumber.trim() || testCalling}
+                  className="mt-4 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-bold text-white bg-emerald-600 rounded-lg disabled:opacity-50 hover:bg-emerald-700 transition-colors"
+                >
+                  <PhoneCall className="w-4 h-4" />
+                  {testCalling ? 'Calling you…' : 'Call my phone'}
+                </button>
+                <p className="text-[11px] text-gray-400 mt-3 text-center">Uses the agent&apos;s attached phone number · standard call charges may apply</p>
+              </div>
+            )}
           </div>
         </div>
       )}

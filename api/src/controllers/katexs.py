@@ -1078,17 +1078,19 @@ def _voice_preview_cache_path(provider: str, voice_id: str) -> str:
 
 
 @router.get("/voice-preview")
-async def voice_preview(voice_id: str, provider: str = "11labs"):
+async def voice_preview(voice_id: str, provider: str = "11labs", text: str | None = None):
     """Synthesize a short voice sample (MP3) for the voice picker."""
     from fastapi import Response as FastResponse
     import os as _os
 
     os.makedirs(_PREVIEW_DIR, exist_ok=True)
-    cache = _voice_preview_cache_path(provider, voice_id)
-    if _os.path.exists(cache) and (_os.path.getmtime(cache) > _os.path.getmtime(__file__) - 7 * 86400):
-        return FastResponse(open(cache, "rb").read(), media_type="audio/mpeg", headers={"Cache-Control": "public, max-age=604800"})
-
-    sample_text = "Hi, I'm your AI voice agent from Katexs. How can I help you today?"
+    sample_text = text or "Hi, I'm your AI voice agent from Katexs. How can I help you today?"
+    if len(sample_text) > 400:
+        raise HTTPException(status_code=400, detail="Text too long (max 400 chars)")
+    if not text:
+        cache = _voice_preview_cache_path(provider, voice_id)
+        if _os.path.exists(cache) and (_os.path.getmtime(cache) > _os.path.getmtime(__file__) - 7 * 86400):
+            return FastResponse(open(cache, "rb").read(), media_type="audio/mpeg", headers={"Cache-Control": "public, max-age=604800"})
     audio = None
 
     if provider == "openai":
@@ -1310,3 +1312,80 @@ async def stripe_webhook(request: Request):
         await db.commit()
     logger.info(f"Stripe topup completed: {credits} minutes for tenant {tnt}")
     return {"received": True, "ok": True}
+
+
+class TalkRequest(BaseModel):
+    text: str = Field(..., min_length=1, max_length=2000)
+    conversation_id: str | None = None
+
+
+@router.post("/voice-assistant/{agent_key}/talk")
+async def voice_talk(
+    agent_key: str,
+    body: TalkRequest,
+    tenant_id: uuid.UUID = Depends(get_current_tenant_id),
+    db: AsyncSession = Depends(get_async_db),
+):
+    """Browser talk test — runs the agent brain (same pipeline as phone calls) and returns the reply."""
+    from src.models.conversation import Conversation, ConversationStatus
+
+    agent = await _resolve_agent(db, tenant_id, agent_key)
+    if not agent.is_active:
+        raise HTTPException(status_code=400, detail="Agent is not active")
+
+    conversation_id = None
+    if body.conversation_id:
+        conv = await db.get(Conversation, uuid.UUID(body.conversation_id))
+        if conv and str(conv.agent_id) == str(agent.id):
+            conversation_id = conv.id
+    if conversation_id is None:
+        conv = Conversation(
+            app_id=None,
+            agent_id=agent.id,
+            account_id=None,
+            name=f"Browser test — {datetime.now(UTC).strftime('%b %d %H:%M')}",
+            status=ConversationStatus.ACTIVE,
+        )
+        db.add(conv)
+        await db.flush()
+        conversation_id = conv.id
+    await db.commit()
+
+    from src.services.conversation_service import ConversationService
+    from src.services.agents.agent_loader_service import AgentLoaderService
+    from src.services.agents.agent_manager import AgentManager
+    from src.services.agents.chat_service import ChatService
+    from src.services.agents.chat_stream_service import ChatStreamService
+
+    conversation_history = await ConversationService.get_conversation_history_cached(
+        db=db,
+        conversation_id=conversation_id,
+        limit=30,
+    )
+    chat_stream = ChatStreamService(
+        agent_loader=AgentLoaderService(AgentManager()),
+        chat_service=ChatService(),
+    )
+    chunks = []
+    async for event_data in chat_stream.stream_agent_response(
+        agent_name=agent.slug,
+        message=body.text,
+        conversation_history=conversation_history,
+        conversation_id=str(conversation_id),
+        attachments=None,
+        llm_config_id=None,
+        db=db,
+        user_id=None,
+        tenant_id=tenant_id,
+        trigger_source="web_test",
+        trigger_detail="",
+    ):
+        if event_data.startswith("data: "):
+            try:
+                evt = json.loads(event_data[6:])
+                if evt.get("type") == "chunk":
+                    chunks.append(evt.get("content", ""))
+            except Exception:
+                pass
+    reply = "".join(chunks).strip() or "Sorry, I did not catch that. Could you repeat it?"
+    return {"success": True, "reply": reply, "conversation_id": str(conversation_id)}
