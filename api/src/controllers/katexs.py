@@ -1541,3 +1541,76 @@ async def katexs_agent_chat(
                 pass
     reply = "".join(chunks).strip() or "Sorry, I did not catch that."
     return {"success": True, "reply": reply, "agent_id": str(agent.id), "slug": agent.slug}
+
+
+class _TenantSummary(BaseModel):
+    id: str
+    name: str = ""
+    created_at: str = ""
+
+
+@compat_router.get("/auth/me")
+@compat_router.get("/user/profile")
+async def katexs_admin_me(
+    account: Account = Depends(get_current_account),
+    db: AsyncSession = Depends(get_async_db),
+):
+    """Admin panel: current account + profile (alias of console /me, shaped for the Lovable UI)."""
+    from src.services import AuthService
+
+    tenants = []
+    try:
+        tenants = await AuthService.get_account_tenants(db, account.id)
+    except Exception:
+        tenants = []
+    tenant_list = []
+    for t in tenants or []:
+        if isinstance(t, dict):
+            tenant_list.append(_TenantSummary(id=str(t.get("id", "")), name=str(t.get("name") or t.get("workspace_name") or "")))
+        else:
+            tenant_list.append(_TenantSummary(id=str(getattr(t, "id", "")), name=str(getattr(t, "name", "") or "")))
+    return {
+        "success": True,
+        "data": {
+            "id": str(account.id),
+            "email": account.email,
+            "name": account.name or "",
+            "status": account.status,
+            "created_at": account.created_at.isoformat() if account.created_at else None,
+            "tenants": [t.model_dump() for t in tenant_list],
+        },
+    }
+
+
+@compat_router.get("/workspace")
+@compat_router.get("/settings")
+async def katexs_admin_workspace(
+    tenant_id: uuid.UUID = Depends(get_current_tenant_id),
+    db: AsyncSession = Depends(get_async_db),
+):
+    """Admin panel: workspace + settings summary (safe defaults if config rows missing)."""
+    from sqlalchemy import text as sqltext
+
+    name = ""
+    try:
+        row = (await db.execute(sqltext("SELECT name FROM tenants WHERE id = :t"), {"t": str(tenant_id)})).fetchone()
+        if row:
+            name = row[0] or ""
+    except Exception:
+        name = ""
+    credits = {"total": 0, "used": 0, "available": 0}
+    try:
+        row = (await db.execute(sqltext("SELECT total_credits, used_credits, available_credits FROM credit_balances WHERE tenant_id = :t"), {"t": str(tenant_id)})).fetchone()
+        if row:
+            credits = {"total": int(row[0] or 0), "used": int(row[1] or 0), "available": int(row[2] or 0)}
+    except Exception:
+        pass
+    return {
+        "success": True,
+        "data": {
+            "workspace": {"id": str(tenant_id), "name": name or "Katexs Workspace", "domain": "app.katexs.tech"},
+            "billing": {"plan": "voice-minutes", "minutes": credits, "currency": "usd"},
+            "features": {"voice": True, "chat": True, "knowledge_bases": True, "tables": False, "workflows": False},
+            "message": "Katexs platform settings",
+        },
+    }
