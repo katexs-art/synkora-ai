@@ -167,7 +167,8 @@ export default function VoiceStudioPage() {
       setTestNumber('')
       toast.success(`Calling ${res.calling} from ${res.from || 'your agent number'} — pick up!`)
     } catch (e: any) {
-      toast.error(e?.message || 'Test call failed')
+      const detail = e?.response?.data?.detail
+      toast.error(typeof detail === 'string' ? detail : 'Test call failed — add a phone number to this agent first (Numbers)')
     } finally {
       setTestCalling(false)
     }
