@@ -138,7 +138,7 @@ export default function VoiceMeetingsSettings({ agentSlug }: Props) {
               />
             </div>
             <p className="text-xs text-gray-500">
-              Configure phone number and Vapi credentials in{' '}
+              Configure phone number and credentials in{' '}
               <a href={`/agents/${agentSlug}/settings/phone`} className="text-red-500 underline">
                 Phone Settings
               </a>
@@ -159,17 +159,17 @@ export default function VoiceMeetingsSettings({ agentSlug }: Props) {
               label="Show 'Call Agent' button on public agent card"
             />
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Vapi Public Key</label>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Public Key</label>
               <input
                 type="text"
                 value={config.web_call.vapi_public_key ?? ''}
                 onChange={(e) => setWebCall({ vapi_public_key: e.target.value || null })}
-                placeholder="Your Vapi public key (safe for browser)"
+                placeholder="Optional — provider public key"
                 className="w-full border rounded px-3 py-2 text-sm font-mono"
               />
               <p className="text-xs text-gray-500 mt-1">
                 Find this in your{' '}
-                <span className="text-gray-700 font-medium">Vapi Dashboard → Account → Public Key</span>.
+                <span className="text-gray-700 font-medium">Optional: use your own provider account instead of Katexs-managed</span>.
                 This is not your API secret.
               </p>
             </div>

@@ -208,19 +208,6 @@ export default function VoiceStudioPage() {
     }
   }
 
-  async function handleSaveVapiKey() {
-    if (!vapiKey.trim()) return
-    try {
-      await saveVapiCredential(vapiKey.trim())
-      setVapiKey('')
-      setVapiCredConfigured(true)
-      toast.success('Your Vapi API key saved — numbers & billing now run on your Vapi account')
-      await load()
-    } catch {
-      toast.error('Failed to save Vapi API key')
-    }
-  }
-
   // ---------------- in-browser talk test ----------------
   const micSupported = typeof window !== 'undefined' && !!((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition)
 
@@ -394,12 +381,8 @@ export default function VoiceStudioPage() {
               <Cable className="w-3.5 h-3.5" /> {provisioned ? 'Assistant live' : 'Not provisioned'}
             </span>
             {assistantId && <span className="text-xs font-mono text-gray-500">assistant: {assistantId}</span>}
-            <span className={`px-2 py-0.5 rounded-full text-[11px] font-bold uppercase ${vapiCredConfigured ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500'}`}>
-              {vapiCredConfigured ? 'Your Vapi key' : 'Katexs-managed Vapi'}
-            </span>
-            <span className={`px-2 py-0.5 rounded-full text-[11px] font-bold uppercase ${usesPlatformKey ? 'bg-gray-100 text-gray-500' : 'bg-blue-100 text-blue-700'}`}>
-              {usesPlatformKey ? 'Katexs-managed LLM' : 'Your LLM key'}
-            </span>
+            
+            <span className="px-2 py-0.5 rounded-full text-[11px] font-bold uppercase bg-gray-100 text-gray-500">Katexs-managed (your API keys never needed)</span>
           </div>
         </AgentPagePanel>
 
@@ -415,25 +398,8 @@ export default function VoiceStudioPage() {
         <AgentPagePanel>
           <div className="max-w-3xl space-y-5 p-6">
             <h2 className="text-base font-bold text-gray-900 flex items-center gap-2"><Key className="w-4 h-4 text-gray-400" /> Connections & API keys</h2>
-            <div className="grid md:grid-cols-2 gap-5">
-              <div className="space-y-2">
-                <label className={labelCls}>Vapi API key (optional — bring your own)</label>
-                <p className={hintCls}>Leave blank to use the Katexs-managed provider. Add your own Vapi key to control phone numbers, carriers and billing on your account.</p>
-                <div className="flex gap-2">
-                  <input type="password" value={vapiKey} onChange={(e) => setVapiKey(e.target.value)} placeholder={vapiCredConfigured ? 'Replace your key…' : 'sk-...'} className={fieldCls} />
-                  <button onClick={handleSaveVapiKey} disabled={!vapiKey.trim()} className="px-4 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg disabled:opacity-50 hover:bg-gray-700 transition-colors">
-                    Save
-                  </button>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <label className={labelCls}>LLM API key (optional — bring your own)</label>
-                <p className={hintCls}>Leave blank to run on Katexs (Claude). Add your own Anthropic or OpenAI key to pay your own LLM costs.</p>
-                <div className="flex gap-2">
-                  <input type="password" value={llmApiKey} onChange={(e) => setLlmApiKey(e.target.value)} placeholder="sk-ant-... / sk-..." className={fieldCls} />
-                  <span className="px-3 py-2 text-xs text-gray-400 whitespace-nowrap">saves with config</span>
-                </div>
-              </div>
+            <div className="rounded-xl bg-emerald-50 border border-emerald-200 px-4 py-3 text-sm text-emerald-800">
+              Everything runs on the Katexs-managed infrastructure — voice, AI and phone lines. No API keys needed on your side. You are billed per minute of usage.
             </div>
           </div>
         </AgentPagePanel>

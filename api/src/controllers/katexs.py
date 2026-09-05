@@ -253,7 +253,7 @@ async def auto_build(
             "max_duration_seconds": 300,
             "record_calls": False,
         }
-        key = await PhoneConfigService.get_vapi_api_key(tenant_id, db)
+        key = (await PhoneConfigService.get_vapi_api_key(tenant_id, db)) or os.environ.get("VAPI_API_KEY") or None
         base = getattr(app_settings, "app_base_url", "") or ""
         if key and base:
             try:
@@ -468,7 +468,7 @@ async def describe_build(
             "voice_provider": "elevenlabs", "voice_id": "EXAVITQu4vr4xnSDxMaL",
             "language": "en", "max_duration_seconds": 300, "record_calls": False,
         }
-        key = await PhoneConfigService.get_vapi_api_key(tenant_id, db)
+        key = (await PhoneConfigService.get_vapi_api_key(tenant_id, db)) or os.environ.get("VAPI_API_KEY") or None
         base = getattr(app_settings, "app_base_url", "") or ""
         if key and base:
             try:
@@ -691,7 +691,7 @@ class VoiceAssistantUpdate(BaseModel):
 async def _katexs_vapi_key(db: AsyncSession, tenant_id) -> str:
     key = None
     try:
-        key = await PhoneConfigService.get_vapi_api_key(tenant_id, db)
+        key = (await PhoneConfigService.get_vapi_api_key(tenant_id, db)) or os.environ.get("VAPI_API_KEY") or None
     except Exception:
         key = None
     if not key:

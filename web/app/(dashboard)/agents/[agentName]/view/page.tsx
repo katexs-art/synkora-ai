@@ -1019,13 +1019,13 @@ export default function AgentViewPage() {
               <button
                 onClick={async () => {
                   if (!vapiPublicKey) {
-                    toast.error('Vapi public key is not configured.')
+                    toast.error('Voice test is not configured for this agent yet.')
                     return
                   }
                   try {
                     const token = await getWebCallToken(agentName)
                     if (!token.vapi_assistant_id) {
-                      toast.error('No Vapi assistant configured. Save Phone Settings first to register the assistant.')
+                      toast.error('No voice assistant configured for this agent yet.')
                       return
                     }
                     const Vapi = (await import('@vapi-ai/web')).default
@@ -1037,7 +1037,7 @@ export default function AgentViewPage() {
                     setVapiInstance(vapi)
                     setCallActive(true)
                   } catch {
-                    toast.error('Failed to start call. Check Vapi configuration.')
+                    toast.error('Failed to start call — check voice configuration.')
                   }
                 }}
                 className="px-6 py-3 bg-green-600 text-white rounded-full font-medium hover:bg-green-700 text-sm"

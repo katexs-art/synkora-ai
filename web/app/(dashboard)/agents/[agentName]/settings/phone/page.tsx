@@ -3,13 +3,11 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
-import { Phone, Key, Save, Copy, Check, Plus, Trash2 } from 'lucide-react'
+import { Phone, Save, Copy, Check, Plus, Trash2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import {
   getPhoneConfig,
   savePhoneConfig,
-  checkCredential,
-  saveVapiCredential,
   getPhoneNumbers,
   addPhoneNumber,
   removePhoneNumber,
@@ -51,9 +49,6 @@ export default function AgentPhoneSettingsPage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [config, setConfig] = useState<PhoneConfig>(DEFAULT_CONFIG)
-  const [credConfigured, setCredConfigured] = useState(false)
-  const [vapiApiKey, setVapiApiKey] = useState('')
-  const [savingKey, setSavingKey] = useState(false)
   const [phoneNumbers, setPhoneNumbers] = useState<PhoneNumber[]>([])
   const [newNumber, setNewNumber] = useState('')
   const [addingNumber, setAddingNumber] = useState(false)
@@ -69,16 +64,14 @@ export default function AgentPhoneSettingsPage() {
   async function load() {
     try {
       setLoading(true)
-      const [phoneConfig, credCheck, numbers, agent] = await Promise.all([
+      const [phoneConfig, numbers, agent] = await Promise.all([
         getPhoneConfig(agentName),
-        checkCredential('vapi'),
         getPhoneNumbers(),
         apiClient.getAgent(agentName),
       ])
       if (phoneConfig && Object.keys(phoneConfig).length > 0) {
         setConfig({ ...DEFAULT_CONFIG, ...phoneConfig } as PhoneConfig)
       }
-      setCredConfigured(credCheck.configured)
       setAgentId(agent.id)
       setPhoneNumbers(numbers.filter((n: PhoneNumber) => n.agent_id === agent.id))
     } catch (err) {
@@ -98,21 +91,6 @@ export default function AgentPhoneSettingsPage() {
       toast.error('Failed to save phone settings')
     } finally {
       setSaving(false)
-    }
-  }
-
-  async function handleSaveApiKey() {
-    if (!vapiApiKey.trim()) return
-    setSavingKey(true)
-    try {
-      await saveVapiCredential(vapiApiKey.trim())
-      setVapiApiKey('')
-      setCredConfigured(true)
-      toast.success('Vapi API key saved')
-    } catch {
-      toast.error('Failed to save API key')
-    } finally {
-      setSavingKey(false)
     }
   }
 
@@ -149,7 +127,7 @@ export default function AgentPhoneSettingsPage() {
 
   if (loading) {
     return (
-      <AgentPageShell agentName={agentName} title="Phone Settings" description="Configure inbound phone calls via Vapi.ai." icon={Phone} badge="Phone">
+      <AgentPageShell agentName={agentName} title="Phone Settings" description="Configure inbound phone calls." icon={Phone} badge="Phone">
         <AgentPagePanel>
           <div className="flex items-center justify-center h-40 text-gray-400 text-sm">Loading…</div>
         </AgentPagePanel>
@@ -161,7 +139,7 @@ export default function AgentPhoneSettingsPage() {
     <AgentPageShell
       agentName={agentName}
       title="Phone Settings"
-      description="Let callers reach this agent via phone through Vapi.ai."
+      description="Let callers reach this agent by phone."
       icon={Phone}
       badge="Phone"
     >
@@ -195,37 +173,10 @@ export default function AgentPhoneSettingsPage() {
             </button>
           </div>
 
-          {/* Vapi API Key */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <Key className="w-4 h-4 text-gray-400" />
-              <label className="text-sm font-medium text-gray-700">Vapi API Key</label>
-              {credConfigured && (
-                <span className="text-xs text-green-600 font-medium bg-green-50 px-2 py-0.5 rounded-full">Configured</span>
-              )}
-            </div>
-            <div className="flex gap-2">
-              <input
-                type="password"
-                value={vapiApiKey}
-                onChange={(e) => setVapiApiKey(e.target.value)}
-                placeholder={credConfigured ? 'Enter new key to replace' : 'sk-...'}
-                className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500"
-              />
-              <button
-                onClick={handleSaveApiKey}
-                disabled={!vapiApiKey.trim() || savingKey}
-                className="px-4 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg disabled:opacity-50 hover:bg-gray-700 transition-colors"
-              >
-                {savingKey ? 'Saving…' : 'Save Key'}
-              </button>
-            </div>
-          </div>
-
           {/* Webhook URL */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-gray-700">Webhook URL</label>
-            <p className="text-xs text-gray-500">Configure this URL in your Vapi phone number settings</p>
+            <p className="text-xs text-gray-500">Auto-configured webhook for call events</p>
             <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2">
               <span className="flex-1 text-sm font-mono text-gray-600 truncate">{webhookUrl}</span>
               <button onClick={copyWebhook} className="text-gray-400 hover:text-gray-600 flex-shrink-0">
@@ -236,8 +187,8 @@ export default function AgentPhoneSettingsPage() {
 
           {/* Phone numbers */}
           <div className="space-y-3">
-            <label className="text-sm font-medium text-gray-700">Phone Numbers (BYOP)</label>
-            <p className="text-xs text-gray-500">Add numbers you own in Vapi and want to route to this agent</p>
+            <label className="text-sm font-medium text-gray-700">Phone Numbers</label>
+            <p className="text-xs text-gray-500">Numbers routed to this agent (provisioned by Katexs)</p>
             {phoneNumbers.map((pn) => (
               <div key={pn.id} className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-lg px-3 py-2">
                 <span className="text-sm font-mono text-gray-700">{pn.phone_number}</span>
