@@ -85,6 +85,9 @@ export default function VoiceStudioPage() {
   const [talkInput, setTalkInput] = useState('')
   const [convId, setConvId] = useState<string | null>(null)
   const [recognition, setRecognition] = useState<any>(null)
+  const [talkUrl, setTalkUrl] = useState<string | null>(null)
+  const [sampleUrl, setSampleUrl] = useState<string | null>(null)
+  const [voiceNote, setVoiceNote] = useState('')
 
   useEffect(() => {
     load()
@@ -163,12 +166,8 @@ export default function VoiceStudioPage() {
         throw new Error(detail)
       }
       const url = URL.createObjectURL(blob)
-      const audio = new Audio(url)
-      audio.onended = () => { setPreviewing(false); URL.revokeObjectURL(url) }
-      audio.onerror = () => { setPreviewing(false); toast.error('Audio playback failed in this browser') }
-      await audio.play()
+      setSampleUrl((prev) => { if (prev) URL.revokeObjectURL(prev); return url })
       setPreviewing(false)
-      setTimeout(() => URL.revokeObjectURL(url), 60000)
     } catch (e: any) {
       setPreviewing(false)
       const detail = e?.response?.data?.detail || e?.message
@@ -211,6 +210,18 @@ export default function VoiceStudioPage() {
   // ---------------- in-browser talk test ----------------
   const micSupported = typeof window !== 'undefined' && !!((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition)
 
+  function speakViaSystem(text: string) {
+    try {
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+        window.speechSynthesis.cancel()
+        const u = new SpeechSynthesisUtterance(text)
+        u.rate = 1.05
+        window.speechSynthesis.speak(u)
+        setVoiceNote('System-voice fallback (browser speech)')
+      }
+    } catch { /* no-op */ }
+  }
+
   function speakText(text: string) {
     return new Promise<void>((resolve) => {
       apiClient.axios
@@ -220,12 +231,20 @@ export default function VoiceStudioPage() {
         })
         .then((resp) => {
           const url = URL.createObjectURL(resp.data as Blob)
-          const audio = new Audio(url)
-          audio.onended = () => { URL.revokeObjectURL(url); resolve() }
-          audio.onerror = () => resolve()
-          audio.play().catch(() => resolve())
+          setTalkUrl((prev) => { if (prev) URL.revokeObjectURL(prev); return url })
+          setVoiceNote('')
+          setTimeout(() => {
+            const el = document.getElementById('talk-audio') as HTMLAudioElement | null
+            if (el) { el.play().catch(() => speakViaSystem(text)) } else { speakViaSystem(text) }
+          }, 150)
+          resolve()
         })
-        .catch(() => resolve())
+        .catch((e: any) => {
+          const detail = e?.response?.data?.detail || e?.message
+          setVoiceNote(typeof detail === 'string' ? detail : 'Voice synthesis unavailable')
+          speakViaSystem(text)
+          resolve()
+        })
     })
   }
 
@@ -289,6 +308,9 @@ export default function VoiceStudioPage() {
     setTalkMsgs([])
     setConvId(null)
     setTestNumber('')
+    setTalkUrl((u) => { if (u) URL.revokeObjectURL(u); return null })
+    setSampleUrl((u) => { if (u) URL.revokeObjectURL(u); return null })
+    setVoiceNote('')
   }
 
   async function handleSave() {
@@ -504,6 +526,9 @@ export default function VoiceStudioPage() {
                   </button>
                 </div>
                 <p className={hintCls}>Hear the voice before you commit. Custom voice IDs (e.g. ElevenLabs) also work.</p>
+                {sampleUrl && (
+                  <audio key={sampleUrl} controls autoPlay className="w-full h-9 mt-1" src={sampleUrl} />
+                )}
               </div>
             </div>
             <div className="grid md:grid-cols-3 gap-4">
@@ -727,6 +752,10 @@ export default function VoiceStudioPage() {
                   ))}
                   {talkBusy && <p className="text-xs text-gray-400 animate-pulse text-center">agent is thinking…</p>}
                 </div>
+                {talkUrl && (
+                  <audio key={talkUrl} id="talk-audio" controls autoPlay className="w-full h-9 mb-3" src={talkUrl} onError={() => speakViaSystem(talkMsgs[talkMsgs.length - 1]?.text || '')} />
+                )}
+                {voiceNote && <p className="text-[11px] text-amber-600 -mt-2 mb-2">{voiceNote}</p>}
                 <div className="flex gap-2">
                   <button
                     onClick={toggleMic}
