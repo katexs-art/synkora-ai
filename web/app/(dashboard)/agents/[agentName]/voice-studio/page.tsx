@@ -145,16 +145,25 @@ export default function VoiceStudioPage() {
     if (previewing) return
     setPreviewing(true)
     try {
-      const resp = await apiClient.axios.get(`/api/v1/katexs/voice-preview?provider=${encodeURIComponent(voiceProvider)}&voice_id=${encodeURIComponent(voiceId)}`, { responseType: 'blob' })
+      const resp = await apiClient.axios.get(`/api/v1/katexs/voice-preview?provider=${encodeURIComponent(voiceProvider)}&voice_id=${encodeURIComponent(voiceId)}`, { responseType: 'blob', validateStatus: (st) => st === 200 })
       const blob = resp.data as Blob
+      if (!blob.type.includes('audio')) {
+        const txt = await blob.text()
+        let detail = 'Sample failed'
+        try { detail = JSON.parse(txt).detail || detail } catch { /* keep */ }
+        throw new Error(detail)
+      }
       const url = URL.createObjectURL(blob)
       const audio = new Audio(url)
       audio.onended = () => { setPreviewing(false); URL.revokeObjectURL(url) }
-      audio.onerror = () => { setPreviewing(false); toast.error('Sample unavailable — TTS key not configured yet') }
+      audio.onerror = () => { setPreviewing(false); toast.error('Audio playback failed in this browser') }
       await audio.play()
+      setPreviewing(false)
+      setTimeout(() => URL.revokeObjectURL(url), 60000)
     } catch (e: any) {
       setPreviewing(false)
-      toast.error(e?.message || 'Sample unavailable — TTS key not configured yet')
+      const detail = e?.response?.data?.detail || e?.message
+      toast.error(typeof detail === 'string' && detail.length > 5 && detail.length < 200 ? detail : 'Sample unavailable')
     }
   }
 

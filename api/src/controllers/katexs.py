@@ -604,10 +604,20 @@ MODEL_CATALOG = {
     "anthropic": [
         "claude-opus-4-6",
         "claude-sonnet-4-5-20250929",
+        "claude-sonnet-4-6",
         "claude-3-7-sonnet-20250219",
         "claude-3-5-haiku-20241022",
+        "claude-3-5-sonnet-20241022",
     ],
-    "openai": ["gpt-4o", "gpt-4o-mini", "gpt-4.1", "gpt-4.1-mini"],
+    "openai": [
+        "gpt-4o",
+        "gpt-4o-mini",
+        "gpt-4.1",
+        "gpt-4.1-mini",
+        "gpt-4.1-nano",
+        "gpt-4-turbo",
+        "o3-mini",
+    ],
 }
 
 TRANSCRIBER_CATALOG = {
