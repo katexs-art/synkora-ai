@@ -157,16 +157,9 @@ export default function VoiceStudioPage() {
     if (previewing) return
     setPreviewing(true)
     try {
-      const resp = await apiClient.axios.get(`/api/v1/katexs/voice-preview?provider=${encodeURIComponent(voiceProvider)}&voice_id=${encodeURIComponent(voiceId)}`, { responseType: 'blob', validateStatus: (st) => st === 200 })
-      const blob = resp.data as Blob
-      if (!blob.type.includes('audio')) {
-        const txt = await blob.text()
-        let detail = 'Sample failed'
-        try { detail = JSON.parse(txt).detail || detail } catch { /* keep */ }
-        throw new Error(detail)
-      }
-      const url = URL.createObjectURL(blob)
-      setSampleUrl((prev) => { if (prev) URL.revokeObjectURL(prev); return url })
+      const r = await apiClient.request('GET', `/api/v1/katexs/voice-preview-token?provider=${encodeURIComponent(voiceProvider)}&voice_id=${encodeURIComponent(voiceId)}`)
+      if (!r?.url) throw new Error('Sample unavailable')
+      setSampleUrl(r.url)
       setPreviewing(false)
     } catch (e: any) {
       setPreviewing(false)
@@ -224,14 +217,11 @@ export default function VoiceStudioPage() {
 
   function speakText(text: string) {
     return new Promise<void>((resolve) => {
-      apiClient.axios
-        .get(`/api/v1/katexs/voice-preview?provider=${encodeURIComponent(voiceProvider)}&voice_id=${encodeURIComponent(voiceId)}&text=${encodeURIComponent(text.slice(0, 380))}`, {
-          responseType: 'blob',
-          validateStatus: (st) => st === 200,
-        })
-        .then((resp) => {
-          const url = URL.createObjectURL(resp.data as Blob)
-          setTalkUrl((prev) => { if (prev) URL.revokeObjectURL(prev); return url })
+      apiClient
+        .request('GET', `/api/v1/katexs/voice-preview-token?provider=${encodeURIComponent(voiceProvider)}&voice_id=${encodeURIComponent(voiceId)}&text=${encodeURIComponent(text.slice(0, 380))}`)
+        .then((r: any) => r?.url || Promise.reject(new Error('No url')))
+        .then((url: string) => {
+          setTalkUrl(url)
           setVoiceNote('')
           setTimeout(() => {
             const el = document.getElementById('talk-audio') as HTMLAudioElement | null

@@ -1077,6 +1077,50 @@ def _voice_preview_cache_path(provider: str, voice_id: str) -> str:
     return f"{_PREVIEW_DIR}/{safe}.mp3"
 
 
+def _synth_audio(provider: str, voice_id: str, sample_text: str) -> bytes:
+    """Synthesize audio via the available provider key. Raises HTTPException on failure."""
+    import os as _os
+    if provider == "openai":
+        key = _os.environ.get("OPENAI_API_KEY")
+        if not key:
+            raise HTTPException(status_code=503, detail="Voice previews for OpenAI need a server OpenAI key (not configured).")
+        import httpx as _httpx
+        resp = _httpx.post(
+            "https://api.openai.com/v1/audio/speech",
+            headers={"Authorization": f"Bearer {key}"},
+            json={"model": "tts-1", "voice": voice_id, "input": sample_text, "response_format": "mp3"},
+            timeout=30,
+        )
+        if resp.status_code != 200:
+            raise HTTPException(status_code=502, detail=f"OpenAI TTS failed: {resp.text[:200]}")
+        return resp.content
+    elif provider == "11labs":
+        key = _os.environ.get("ELEVENLABS_API_KEY")
+        if not key:
+            raise HTTPException(status_code=503, detail="ElevenLabs previews need the Katexs ElevenLabs API key (not configured yet).")
+        import httpx as _httpx
+        resp = _httpx.post(
+            f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}",
+            headers={"xi-api-key": key, "Content-Type": "application/json"},
+            json={"text": sample_text, "model_id": "eleven_turbo_v2_5", "voice_settings": {"stability": 0.5, "similarity_boost": 0.75}},
+            timeout=30,
+        )
+        if resp.status_code != 200:
+            raise HTTPException(status_code=502, detail=f"ElevenLabs TTS failed: {resp.text[:200]}")
+        return resp.content
+    raise HTTPException(status_code=501, detail=f"Preview synthesis not supported yet for provider '{provider}'. Pick ElevenLabs or OpenAI to hear samples.")
+
+
+def _preview_sign(payload: str) -> str:
+    import hashlib
+    import hmac as _hmac
+    secret = os.environ.get("SECRET_KEY") or os.environ.get("JWT_SECRET_KEY") or "katexs-preview"
+    return _hmac.new(secret.encode(), payload.encode(), hashlib.sha256).hexdigest()[:40]
+
+
+
+
+
 @router.get("/voice-preview")
 async def voice_preview(voice_id: str, provider: str = "11labs", text: str | None = None):
     """Synthesize a short voice sample (MP3) for the voice picker."""
@@ -1090,36 +1134,7 @@ async def voice_preview(voice_id: str, provider: str = "11labs", text: str | Non
     cache = _voice_preview_cache_path(provider, voice_id)
     if not text and _os.path.exists(cache) and (_os.path.getmtime(cache) > _os.path.getmtime(__file__) - 7 * 86400):
         return FastResponse(open(cache, "rb").read(), media_type="audio/mpeg", headers={"Cache-Control": "public, max-age=604800"})
-    audio = None
-
-    if provider == "openai":
-        key = _os.environ.get("OPENAI_API_KEY")
-        if not key:
-            raise HTTPException(status_code=503, detail="Voice previews for OpenAI need a server OpenAI key (not configured).")
-        async with httpx.AsyncClient(timeout=30) as client:
-            resp = await client.post(
-                "https://api.openai.com/v1/audio/speech",
-                headers={"Authorization": f"Bearer {key}"},
-                json={"model": "tts-1", "voice": voice_id, "input": sample_text, "response_format": "mp3"},
-            )
-        if resp.status_code != 200:
-            raise HTTPException(status_code=502, detail=f"OpenAI TTS failed: {resp.text[:200]}")
-        audio = resp.content
-    elif provider == "11labs":
-        key = _os.environ.get("ELEVENLABS_API_KEY")
-        if not key:
-            raise HTTPException(status_code=503, detail="ElevenLabs previews need the Katexs ElevenLabs API key (not configured yet).")
-        async with httpx.AsyncClient(timeout=30) as client:
-            resp = await client.post(
-                f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}",
-                headers={"xi-api-key": key, "Content-Type": "application/json"},
-                json={"text": sample_text, "model_id": "eleven_turbo_v2_5", "voice_settings": {"stability": 0.5, "similarity_boost": 0.75}},
-            )
-        if resp.status_code != 200:
-            raise HTTPException(status_code=502, detail=f"ElevenLabs TTS failed: {resp.text[:200]}")
-        audio = resp.content
-    else:
-        raise HTTPException(status_code=501, detail=f"Preview synthesis not supported yet for provider '{provider}'. Pick ElevenLabs or OpenAI to hear samples.")
+    audio = _synth_audio(provider, voice_id, sample_text)
 
     if not text:
         with open(cache, "wb") as f:
@@ -1389,3 +1404,52 @@ async def voice_talk(
                 pass
     reply = "".join(chunks).strip() or "Sorry, I did not catch that. Could you repeat it?"
     return {"success": True, "reply": reply, "conversation_id": str(conversation_id)}
+
+
+def _preview_url(provider: str, voice_id: str, text: str, ttl: int = 120) -> str:
+    from urllib.parse import quote
+    import time as _time
+    exp = int(_time.time()) + ttl
+    payload = f"{provider}|{voice_id}|{text}|{exp}"
+    tok = _preview_sign(payload)
+    url = f"https://api.katexs.tech/api/v1/katexs/voice-preview-public?p={quote(provider)}&v={quote(voice_id)}&x={exp}&t={tok}"
+    if text:
+        url += f"&text={quote(text)}"
+    return url
+
+
+@router.get("/voice-preview-token")
+async def voice_preview_token(
+    voice_id: str,
+    provider: str = "11labs",
+    text: str | None = None,
+    tenant_id: uuid.UUID = Depends(get_current_tenant_id),
+    db: AsyncSession = Depends(get_async_db),
+):
+    """Return a short-lived public URL for a voice sample / spoken reply (native <audio> playback)."""
+    t = (text or "").strip()
+    if len(t) > 380:
+        raise HTTPException(status_code=400, detail="Text too long (max 380 chars)")
+    return {"success": True, "url": _preview_url(provider, voice_id, t)}
+
+
+@router.get("/voice-preview-public")
+async def voice_preview_public(p: str, v: str, x: str, t: str, text: str | None = None):
+    """Public, short-lived, signature-verified audio stream for <audio src> playback."""
+    from fastapi import Response as FastResponse
+    import time as _time
+    try:
+        exp = int(x)
+    except Exception:
+        raise HTTPException(status_code=400, detail="bad token")
+    if int(_time.time()) > exp:
+        raise HTTPException(status_code=410, detail="Link expired — press play again")
+    t2 = (text or "").strip()
+    if len(t2) > 380:
+        raise HTTPException(status_code=400, detail="Text too long")
+    expected = _preview_sign(f"{p}|{v}|{t2}|{exp}")
+    import hmac as _hmac
+    if not _hmac.compare_digest(expected, t):
+        raise HTTPException(status_code=403, detail="bad signature")
+    audio = _synth_audio(p, v, t2)
+    return FastResponse(audio, media_type="audio/mpeg", headers={"Cache-Control": "no-store", "Accept-Ranges": "bytes"})
