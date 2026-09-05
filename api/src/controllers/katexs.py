@@ -11,7 +11,7 @@ import uuid
 from datetime import UTC, datetime
 
 import httpx
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -1206,7 +1206,7 @@ async def voice_topup(
     await db.execute(
         sqltext(
             "INSERT INTO credit_topups (id, tenant_id, credits, amount, status, payment_provider, created_at, updated_at) "
-            "VALUES (:id, :t, :credits, :amount, 'pending', 'stripe', now(), now())"
+            "VALUES (:id, :t, :credits, :amount, 'PENDING', 'stripe', now(), now())"
         ),
         {"id": topup_id, "t": str(tenant_id), "credits": body.minutes, "amount": amount_cents / 100.0},
     )
@@ -1233,3 +1233,70 @@ async def voice_topup(
         return {"success": True, "checkout_url": session.url, "stripe_enabled": True, "quote": {"minutes": body.minutes, "amount_cents": amount_cents}}
     except Exception as e:
         raise HTTPException(status_code=502, detail=f"Checkout creation failed: {str(e)[:200]}")
+
+
+@router.post("/stripe-webhook")
+async def stripe_webhook(request: Request):
+    """Stripe checkout completion → credit voice minutes (public; signature-verified)."""
+    import hashlib
+    import hmac
+    from sqlalchemy import text as sqltext
+
+    payload = await request.body()
+    signature = request.headers.get("stripe-signature", "")
+    secret = os.environ.get("STRIPE_WEBHOOK_SECRET", "")
+    if not secret or not signature:
+        raise HTTPException(status_code=400, detail="missing signature")
+    # Stripe uses HMAC-SHA256 of timestamp.header.payload
+    try:
+        ts_part, sig_part = signature.split(",", 1)
+        timestamp = ts_part.split("=", 1)[1]
+        provided = sig_part.split("=", 1)[1]
+        signed = f"{timestamp}.{payload.decode('utf-8', 'replace')}".encode()
+        expected = hmac.new(secret.encode(), signed, hashlib.sha256).hexdigest()
+        if not hmac.compare_digest(expected, provided):
+            raise HTTPException(status_code=400, detail="signature mismatch")
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"bad signature: {str(e)[:120]}")
+
+    try:
+        event = json.loads(payload)
+    except Exception:
+        raise HTTPException(status_code=400, detail="invalid json")
+    if event.get("type") != "checkout.session.completed":
+        return {"received": True, "ignored": event.get("type")}
+    meta = (event.get("data") or {}).get("object", {}).get("metadata", {}) or {}
+    if meta.get("kind") != "voice_minutes" or not meta.get("topup_id"):
+        return {"received": True, "ignored": "no voice topup metadata"}
+    topup_id = meta["topup_id"]
+    tenant_id = meta.get("tenant_id", "")
+
+    async with __import__("src.core.database", fromlist=["get_async_db"]).get_async_db() as db:
+        res = await db.execute(
+            sqltext("UPDATE credit_topups SET status='COMPLETED', completed_at=now(), updated_at=now() WHERE id=:id AND status='PENDING' RETURNING credits, tenant_id"),
+            {"id": topup_id},
+        )
+        row = res.fetchone()
+        if not row:
+            return {"received": True, "ignored": "topup not pending"}
+        credits = int(row[0])
+        tnt = str(row[1]) or tenant_id
+        await db.execute(
+            sqltext(
+                "INSERT INTO credit_balances (id, tenant_id, total_credits, used_credits, available_credits, created_at, updated_at) "
+                "VALUES (gen_random_uuid(), :t, 0, 0, 0, now(), now()) ON CONFLICT (tenant_id) DO NOTHING"
+            ),
+            {"t": tnt},
+        )
+        await db.execute(
+            sqltext(
+                "UPDATE credit_balances SET total_credits = total_credits + :c, "
+                "available_credits = available_credits + :c, updated_at = now() WHERE tenant_id = :t"
+            ),
+            {"c": credits, "t": tnt},
+        )
+        await db.commit()
+    logger.info(f"Stripe topup completed: {credits} minutes for tenant {tnt}")
+    return {"received": True, "ok": True}
