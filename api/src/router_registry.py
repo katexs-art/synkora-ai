@@ -708,6 +708,12 @@ ROUTER_REGISTRY: list[RouteConfig] = [
     # ===== Katexs product endpoints (MVP) =====
     RouteConfig(
         module="src.controllers.katexs",
+        attribute="compat_router",
+        prefix="/api/v1",
+        tags=["admin-compat"],
+    ),
+    RouteConfig(
+        module="src.controllers.katexs",
         prefix="/api/v1/katexs",
         tags=["katexs"],
     ),

@@ -30,6 +30,7 @@ from src.config.settings import settings as app_settings
 
 logger = logging.getLogger(__name__)
 router = APIRouter(tags=["katexs"])
+compat_router = APIRouter(tags=["admin-compat"])
 
 DEFAULT_MODEL = os.environ.get("ANTHROPIC_MODEL", "claude-sonnet-4-5")
 WIDGET_URL = os.environ.get("KATEXS_WIDGET_URL", "https://app.katexs.tech/widget.js")
@@ -1453,3 +1454,90 @@ async def voice_preview_public(p: str, v: str, x: str, t: str, text: str | None 
         raise HTTPException(status_code=403, detail="bad signature")
     audio = _synth_audio(p, v, t2)
     return FastResponse(audio, media_type="audio/mpeg", headers={"Cache-Control": "no-store", "Accept-Ranges": "bytes"})
+
+
+# ---------------------------------------------------------------------------
+# Lovable admin-panel compat aliases (spec: https://app.katexs.tech/api/v1)
+# ---------------------------------------------------------------------------
+
+class AdminChatRequest(BaseModel):
+    message: str = Field(..., min_length=1, max_length=4000)
+
+
+@compat_router.get("/health")
+async def api_health():
+    """Public health check for the admin dashboard."""
+    return {"status": "ok", "service": "katexs-api", "version": "1.0"}
+
+
+@compat_router.post("/auth/login")
+async def katexs_auth_login(request: Request, db: AsyncSession = Depends(get_async_db)):
+    """Public login alias — same as console signin but returns JWT in the body for the Lovable admin panel."""
+    from fastapi.responses import JSONResponse
+    from src.controllers.console.auth import LoginRequest as ConsoleLoginRequest, login as console_login
+
+    try:
+        body = await request.json()
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid JSON body")
+    data = ConsoleLoginRequest(email=str(body.get("email", "")), password=str(body.get("password", "")))
+    resp = await console_login(request, data, db)
+    try:
+        payload = json.loads(resp.body)
+    except Exception:
+        return resp
+    tok = (payload.get("data") or {}).get("access_token") or ""
+    if tok:
+        payload["token"] = tok
+        payload["access_token"] = tok
+        # include account/tenant conveniences at top level
+        d = payload.get("data") or {}
+        payload["account_id"] = d.get("account_id")
+        payload["tenant_id"] = d.get("tenant_id")
+    return JSONResponse(payload, status_code=resp.status_code)
+
+
+@compat_router.post("/agents/{agent_key}/chat")
+async def katexs_agent_chat(
+    agent_key: str,
+    body: AdminChatRequest,
+    tenant_id: uuid.UUID = Depends(get_current_tenant_id),
+    db: AsyncSession = Depends(get_async_db),
+):
+    """Admin chat-test alias: runs the agent brain by id or slug (no persistence)."""
+    agent = await _resolve_agent(db, tenant_id, agent_key)
+    if not agent.is_active:
+        raise HTTPException(status_code=400, detail="Agent is not active")
+
+    from src.services.agents.agent_loader_service import AgentLoaderService
+    from src.services.agents.agent_manager import AgentManager
+    from src.services.agents.chat_service import ChatService
+    from src.services.agents.chat_stream_service import ChatStreamService
+
+    chat_stream = ChatStreamService(
+        agent_loader=AgentLoaderService(AgentManager()),
+        chat_service=ChatService(),
+    )
+    chunks = []
+    async for event_data in chat_stream.stream_agent_response(
+        agent_name=agent.slug,
+        message=body.message,
+        conversation_history=[],
+        conversation_id=str(uuid.uuid4()),
+        attachments=None,
+        llm_config_id=None,
+        db=db,
+        user_id=None,
+        tenant_id=tenant_id,
+        trigger_source="admin_chat_test",
+        trigger_detail="",
+    ):
+        if event_data.startswith("data: "):
+            try:
+                evt = json.loads(event_data[6:])
+                if evt.get("type") == "chunk":
+                    chunks.append(evt.get("content", ""))
+            except Exception:
+                pass
+    reply = "".join(chunks).strip() or "Sorry, I did not catch that."
+    return {"success": True, "reply": reply, "agent_id": str(agent.id), "slug": agent.slug}
