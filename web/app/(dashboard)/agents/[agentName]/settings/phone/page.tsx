@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
+import Link from 'next/link'
 import { Phone, Key, Save, Copy, Check, Plus, Trash2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import {
@@ -166,6 +167,13 @@ export default function AgentPhoneSettingsPage() {
     >
       <AgentPagePanel>
         <div className="max-w-2xl space-y-8 p-6 md:p-8">
+          <Link href={`/agents/${agentName}/voice-studio`} className="flex items-center justify-between rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm hover:bg-emerald-100 transition-colors">
+            <span>
+              <span className="font-semibold text-emerald-800">Open Voice Agent Studio</span>
+              <span className="block text-xs text-emerald-700 mt-0.5">LLM, voice, transcriber, call behavior & analysis — synced live</span>
+            </span>
+            <span className="text-emerald-700 font-bold">&rarr;</span>
+          </Link>
 
           {/* Enable toggle */}
           <div className="flex items-center justify-between">

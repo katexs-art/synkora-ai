@@ -99,8 +99,9 @@ export default function VoicePage() {
                 {a.vapi_assistant_id && <p className="text-xs text-gray-400 mt-0.5 font-mono">assistant: {a.vapi_assistant_id.slice(0, 8)}…</p>}
               </div>
               <div className="flex gap-2">
-                <Link href={`/agents/${a.slug}`} className="text-sm text-emerald-600 hover:text-emerald-700 font-medium">Open</Link>
-                <Link href={`/agents/${a.slug}/settings/phone`} className="text-sm text-gray-600 hover:text-gray-800 font-medium">Phone settings</Link>
+                <Link href={`/agents/${a.slug}/voice-studio`} className="text-sm text-emerald-600 hover:text-emerald-700 font-medium">Voice Studio</Link>
+                <Link href={`/agents/${a.slug}`} className="text-sm text-gray-600 hover:text-gray-800 font-medium">Open</Link>
+                <Link href={`/agents/${a.slug}/settings/phone`} className="text-sm text-gray-600 hover:text-gray-800 font-medium">Numbers</Link>
               </div>
             </div>
           ))}

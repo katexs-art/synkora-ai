@@ -580,3 +580,445 @@ async def voice_overview(
         "calls": calls,
     }
 
+
+# ---------------------------------------------------------------------------
+# Voice Agent Studio — full Vapi assistant configuration surface
+# (voice / model / transcriber / call behavior / analysis), synced live
+# to the Vapi assistant AND persisted to the engine agent.
+# ---------------------------------------------------------------------------
+
+_VOICE_CACHE: dict = {"ts": 0.0, "voices": []}
+_VOICE_CACHE_TTL = 900  # 15 min
+
+VOICE_PROVIDERS = [
+    {"value": "11labs", "label": "ElevenLabs"},
+    {"value": "openai", "label": "OpenAI"},
+    {"value": "deepgram", "label": "Deepgram"},
+    {"value": "azure", "label": "Azure"},
+    {"value": "playht", "label": "PlayHT"},
+    {"value": "rime", "label": "Rime"},
+    {"value": "cartesia", "label": "Cartesia"},
+]
+
+MODEL_CATALOG = {
+    "anthropic": [
+        "claude-opus-4-6",
+        "claude-sonnet-4-5-20250929",
+        "claude-3-7-sonnet-20250219",
+        "claude-3-5-haiku-20241022",
+    ],
+    "openai": ["gpt-4o", "gpt-4o-mini", "gpt-4.1", "gpt-4.1-mini"],
+}
+
+TRANSCRIBER_CATALOG = {
+    "deepgram": ["nova-2", "nova-3"],
+    "openai": ["whisper-1"],
+}
+
+SPOKEN_LANGUAGES = [
+    {"value": "en", "label": "English"},
+    {"value": "es", "label": "Spanish"},
+    {"value": "fr", "label": "French"},
+    {"value": "de", "label": "German"},
+    {"value": "pt", "label": "Portuguese"},
+    {"value": "it", "label": "Italian"},
+    {"value": "nl", "label": "Dutch"},
+    {"value": "ja", "label": "Japanese"},
+    {"value": "zh", "label": "Chinese"},
+]
+
+
+class VoiceAssistantVoice(BaseModel):
+    provider: str | None = None
+    voice_id: str | None = None
+    speed: float | None = Field(default=None, ge=0.5, le=2.0)
+    stability: float | None = Field(default=None, ge=0.0, le=1.0)
+    similarity_boost: float | None = Field(default=None, ge=0.0, le=1.0)
+    language: str | None = None
+
+
+class VoiceAssistantTranscriber(BaseModel):
+    provider: str | None = None
+    model: str | None = None
+    language: str | None = None
+
+
+class VoiceAssistantModel(BaseModel):
+    provider: str | None = None
+    model: str | None = None
+    temperature: float | None = Field(default=None, ge=0.0, le=2.0)
+    max_tokens: int | None = Field(default=None, ge=64, le=8192)
+    api_key: str | None = Field(default=None, min_length=8, max_length=400)  # BYO LLM key (never echoed)
+
+
+class VoiceAssistantAdvanced(BaseModel):
+    silence_timeout_seconds: int | None = Field(default=None, ge=1, le=120)
+    max_duration_seconds: int | None = Field(default=None, ge=30, le=7200)
+    recording_enabled: bool | None = None
+    background_denoising_enabled: bool | None = None
+    num_words_to_interrupt_assistant: int | None = Field(default=None, ge=1, le=50)
+    interruption_threshold: float | None = Field(default=None, ge=0.0, le=1.0)
+    end_call_phrases: list[str] | None = None
+
+
+class VoiceAssistantAnalysis(BaseModel):
+    summary_enabled: bool | None = None
+    structured_data_enabled: bool | None = None
+
+
+class VoiceAssistantUpdate(BaseModel):
+    first_message: str | None = None
+    end_call_message: str | None = None
+    language: str | None = None
+    system_prompt: str | None = None
+    voice: VoiceAssistantVoice | None = None
+    transcriber: VoiceAssistantTranscriber | None = None
+    model: VoiceAssistantModel | None = None
+    advanced: VoiceAssistantAdvanced | None = None
+    analysis: VoiceAssistantAnalysis | None = None
+
+
+async def _katexs_vapi_key(db: AsyncSession, tenant_id) -> str:
+    key = None
+    try:
+        key = await PhoneConfigService.get_vapi_api_key(tenant_id, db)
+    except Exception:
+        key = None
+    if not key:
+        key = os.environ.get("VAPI_API_KEY")
+    if not key:
+        raise HTTPException(status_code=400, detail="Vapi credential not configured for this tenant")
+    return key
+
+
+async def _resolve_agent(db, tenant_id, agent_key: str) -> Agent:
+    agent = None
+    try:
+        agent = await db.get(Agent, uuid.UUID(agent_key))
+    except Exception:
+        agent = None
+    if agent is None or str(agent.tenant_id) != str(tenant_id):
+        res = await db.execute(
+            select(Agent).filter(Agent.tenant_id == tenant_id, Agent.slug == agent_key)
+        )
+        agent = res.scalar_one_or_none()
+    if agent is None:
+        raise HTTPException(status_code=404, detail="Agent not found")
+    return agent
+
+
+async def _fetch_vapi_assistant_raw(db, tenant_id, assistant_id: str) -> dict:
+    key = await _katexs_vapi_key(db, tenant_id)
+    async with httpx.AsyncClient(timeout=15) as client:
+        resp = await client.get(
+            f"https://api.vapi.ai/assistant/{assistant_id}",
+            headers={"Authorization": f"Bearer {key}"},
+        )
+    if resp.status_code != 200:
+        raise HTTPException(status_code=502, detail=f"Vapi assistant fetch failed ({resp.status_code}): {resp.text[:200]}")
+    return resp.json()
+
+
+async def _voice_catalog(db, tenant_id) -> list[dict]:
+    import time as _time
+    now = _time.time()
+    if _VOICE_CACHE["voices"] and (now - _VOICE_CACHE["ts"]) < _VOICE_CACHE_TTL:
+        return _VOICE_CACHE["voices"]
+    voices: list[dict] = []
+    try:
+        key = await _katexs_vapi_key(db, tenant_id)
+        async with httpx.AsyncClient(timeout=15) as client:
+            resp = await client.get(
+                "https://api.vapi.ai/voice?limit=300",
+                headers={"Authorization": f"Bearer {key}"},
+            )
+        if resp.status_code == 200:
+            data = resp.json()
+            if isinstance(data, list):
+                voices = [
+                    {
+                        "voiceId": v.get("voiceId", ""),
+                        "name": v.get("name") or v.get("voiceId", ""),
+                        "provider": v.get("provider", ""),
+                        "language": v.get("language", ""),
+                    }
+                    for v in data
+                    if v.get("voiceId")
+                ]
+    except Exception:
+        voices = []
+    if not voices:
+        # curated fallback (common ElevenLabs voices)
+        voices = [
+            {"voiceId": "EXAVITQu4vr4xnSDxMaL", "name": "Rachel", "provider": "11labs", "language": "en"},
+            {"voiceId": "21m00Tcm4TlvDq8ikWAM", "name": "Bella", "provider": "11labs", "language": "en"},
+            {"voiceId": "onwK4e9ZLuTAKqWW03F9", "name": "Domi", "provider": "11labs", "language": "en"},
+            {"voiceId": "TX3LPaxmHKxFdv7VOQHJ", "name": "Elli", "provider": "11labs", "language": "en"},
+            {"voiceId": "VR6AewLTigWG4xSOukaG", "name": "Arnold", "provider": "11labs", "language": "en"},
+            {"voiceId": "pNInz6obpgDQGcFmaJgB", "name": "Adam", "provider": "11labs", "language": "en"},
+            {"voiceId": "yoZ06aMxZJJ28mfd3POQ", "name": "Sam", "provider": "11labs", "language": "en"},
+        ]
+    _VOICE_CACHE["ts"] = now
+    _VOICE_CACHE["voices"] = voices
+    return voices
+
+
+def _pick(d: dict, keys: list[str]) -> dict:
+    return {k: d[k] for k in keys if k in d and d[k] is not None}
+
+
+@router.get("/voice-assistant/{agent_key}")
+async def get_voice_assistant(
+    agent_key: str,
+    tenant_id: uuid.UUID = Depends(get_current_tenant_id),
+    db: AsyncSession = Depends(get_async_db),
+):
+    agent = await _resolve_agent(db, tenant_id, agent_key)
+    pc = agent.phone_config or {}
+    assistant_id = pc.get("vapi_assistant_id") or ""
+    live: dict = {}
+    if assistant_id:
+        try:
+            live = await _fetch_vapi_assistant_raw(db, tenant_id, assistant_id)
+        except HTTPException:
+            live = {}
+    live_model = live.get("model") or {}
+    live_voice = live.get("voice") or {}
+    live_transcriber = live.get("transcriber") or {}
+    live_analysis = live.get("analysisPlan") or {}
+    live_artifact = live.get("artifactPlan") or {}
+    summary_plan = live_analysis.get("summaryPlan") or {}
+    structured_plan = live_analysis.get("structuredDataPlan") or {}
+
+    # brain (engine default LLM config)
+    brain_res = await db.execute(
+        select(AgentLLMConfig).filter(
+            AgentLLMConfig.agent_id == agent.id, AgentLLMConfig.is_default == True  # noqa: E712
+        ).limit(1)
+    )
+    brain = brain_res.scalar_one_or_none()
+
+    voices = await _voice_catalog(db, tenant_id)
+    return {
+        "success": True,
+        "agent": {
+            "id": str(agent.id),
+            "name": agent.agent_name,
+            "slug": agent.slug,
+            "assistant_id": assistant_id,
+            "provisioned": bool(assistant_id),
+        },
+        "brain": {
+            "system_prompt": agent.system_prompt or "",
+            "provider": brain.provider if brain else (agent.llm_config or {}).get("provider", "anthropic"),
+            "model": brain.model_name if brain else (agent.llm_config or {}).get("model", DEFAULT_MODEL),
+            "temperature": brain.temperature if brain else (agent.llm_config or {}).get("temperature", 0.6),
+            "max_tokens": brain.max_tokens if brain else (agent.llm_config or {}).get("max_tokens", 2048),
+            "uses_platform_key": bool(not (brain and getattr(brain, "uses_platform_key", True) is False) and not (agent.llm_config or {}).get("uses_platform_key") is False),
+        },
+        "call": {
+            "first_message": pc.get("greeting") or live.get("firstMessage") or "",
+            "end_call_message": pc.get("end_call_message") or "",
+            "language": pc.get("language") or live_transcriber.get("language") or "en",
+            "phone_enabled": bool(pc.get("enabled")),
+        },
+        "vapi": {
+            "voice": _pick(live_voice, ["provider", "voiceId", "speed", "stability", "similarityBoost"]),
+            "transcriber": _pick(live_transcriber, ["provider", "model", "language"]),
+            "model": _pick(live_model, ["provider", "model", "temperature", "maxTokens"]),
+            "firstMessage": live.get("firstMessage", ""),
+            "silenceTimeoutSeconds": live.get("silenceTimeoutSeconds"),
+            "maxDurationSeconds": live.get("maxDurationSeconds"),
+            "recordingEnabled": live.get("recordingEnabled"),
+            "backgroundDenoisingEnabled": live.get("backgroundDenoisingEnabled"),
+            "numWordsToInterruptAssistant": live.get("numWordsToInterruptAssistant"),
+            "interruptionThreshold": live.get("interruptionThreshold"),
+            "endCallPhrases": live.get("endCallPhrases") or [],
+            "analysis": {
+                "summary_enabled": bool((summary_plan or {}).get("enabled")),
+                "structured_data_enabled": bool((structured_plan or {}).get("enabled")),
+                "transcript_enabled": bool((live_artifact or {}).get("recordingTranscript")),
+            },
+            "serverUrlSecretSet": bool(live.get("isServerUrlSecretSet")),
+            "raw": live,
+        },
+        "catalog": {
+            "voices": voices,
+            "voice_providers": VOICE_PROVIDERS,
+            "models": MODEL_CATALOG,
+            "transcribers": TRANSCRIBER_CATALOG,
+            "languages": SPOKEN_LANGUAGES,
+        },
+    }
+
+
+@router.put("/voice-assistant/{agent_key}")
+async def update_voice_assistant(
+    agent_key: str,
+    body: VoiceAssistantUpdate,
+    tenant_id: uuid.UUID = Depends(get_current_tenant_id),
+    db: AsyncSession = Depends(get_async_db),
+):
+    agent = await _resolve_agent(db, tenant_id, agent_key)
+    pc = dict(agent.phone_config or {})
+    assistant_id = pc.get("vapi_assistant_id") or ""
+    if not assistant_id:
+        raise HTTPException(status_code=400, detail="This agent has no Vapi assistant provisioned yet. Rebuild the voice agent or register one first.")
+
+    live = await _fetch_vapi_assistant_raw(db, tenant_id, assistant_id)
+    patch: dict = {}
+    vapi_voice: dict = {}
+    vapi_transcriber: dict = {}
+    vapi_model: dict = {}
+
+    if body.first_message is not None:
+        patch["firstMessage"] = body.first_message
+        pc["greeting"] = body.first_message
+    if body.end_call_message is not None:
+        pc["end_call_message"] = body.end_call_message
+    if body.language is not None:
+        pc["language"] = body.language
+        vapi_transcriber["language"] = body.language
+
+    if body.voice is not None:
+        v = body.voice
+        if v.provider is not None:
+            vapi_voice["provider"] = v.provider
+            pc["voice_provider"] = v.provider
+        if v.voice_id is not None:
+            vapi_voice["voiceId"] = v.voice_id
+            pc["voice_id"] = v.voice_id
+        if v.speed is not None:
+            vapi_voice["speed"] = v.speed
+        if v.stability is not None:
+            vapi_voice["stability"] = v.stability
+        if v.similarity_boost is not None:
+            vapi_voice["similarityBoost"] = v.similarity_boost
+        if v.language is not None:
+            vapi_voice["language"] = v.language
+
+    if body.transcriber is not None:
+        t = body.transcriber
+        if t.provider is not None:
+            vapi_transcriber["provider"] = t.provider
+        if t.model is not None:
+            vapi_transcriber["model"] = t.model
+        if t.language is not None:
+            vapi_transcriber["language"] = t.language
+
+    if vapi_voice:
+        merged_voice = dict(live.get("voice") or {})
+        merged_voice.update(vapi_voice)
+        patch["voice"] = merged_voice
+    if vapi_transcriber:
+        merged_tr = dict(live.get("transcriber") or {})
+        merged_tr.update(vapi_transcriber)
+        patch["transcriber"] = merged_tr
+
+    if body.model is not None:
+        m = body.model
+        merged_model = dict(live.get("model") or {})
+        if m.provider is not None:
+            merged_model["provider"] = m.provider
+        if m.model is not None:
+            merged_model["model"] = m.model
+        if m.temperature is not None:
+            merged_model["temperature"] = m.temperature
+        if m.max_tokens is not None:
+            merged_model["maxTokens"] = m.max_tokens
+        # keep the assistant persona aligned with the engine brain prompt
+        if body.system_prompt is not None:
+            merged_model["messages"] = [{"role": "system", "content": body.system_prompt}]
+        patch["model"] = merged_model
+
+    if body.advanced is not None:
+        adv = body.advanced
+        if adv.silence_timeout_seconds is not None:
+            patch["silenceTimeoutSeconds"] = adv.silence_timeout_seconds
+        if adv.max_duration_seconds is not None:
+            patch["maxDurationSeconds"] = adv.max_duration_seconds
+            pc["max_duration_seconds"] = adv.max_duration_seconds
+        if adv.recording_enabled is not None:
+            patch["recordingEnabled"] = adv.recording_enabled
+            pc["record_calls"] = adv.recording_enabled
+        if adv.background_denoising_enabled is not None:
+            patch["backgroundDenoisingEnabled"] = adv.background_denoising_enabled
+        if adv.num_words_to_interrupt_assistant is not None:
+            patch["numWordsToInterruptAssistant"] = adv.num_words_to_interrupt_assistant
+        if adv.interruption_threshold is not None:
+            patch["interruptionThreshold"] = adv.interruption_threshold
+        if adv.end_call_phrases is not None:
+            patch["endCallPhrases"] = adv.end_call_phrases
+
+    if body.analysis is not None:
+        ana = body.analysis
+        ap = dict(live.get("analysisPlan") or {})
+        if ana.summary_enabled is not None:
+            sp = dict(ap.get("summaryPlan") or {})
+            sp["enabled"] = ana.summary_enabled
+            ap["summaryPlan"] = sp
+        if ana.structured_data_enabled is not None:
+            sdp = dict(ap.get("structuredDataPlan") or {})
+            sdp["enabled"] = ana.structured_data_enabled
+            ap["structuredDataPlan"] = sdp
+        if ap:
+            patch["analysisPlan"] = ap
+
+    # Vapi PATCH (whitelist only — webhook/secret untouched)
+    key = await _katexs_vapi_key(db, tenant_id)
+    async with httpx.AsyncClient(timeout=20) as client:
+        resp = await client.patch(
+            f"https://api.vapi.ai/assistant/{assistant_id}",
+            headers={"Authorization": f"Bearer {key}"},
+            json=patch,
+        )
+    if resp.status_code not in (200, 201, 202):
+        raise HTTPException(status_code=502, detail=f"Vapi update failed ({resp.status_code}): {resp.text[:300]}")
+    updated = resp.json()
+
+    # ---- persist engine-side mirrors ----
+    if body.system_prompt is not None:
+        agent.system_prompt = body.system_prompt
+
+    if body.model is not None and (body.model.model is not None or body.model.provider is not None):
+        llm_res = await db.execute(
+            select(AgentLLMConfig).filter(
+                AgentLLMConfig.agent_id == agent.id, AgentLLMConfig.is_default == True  # noqa: E712
+            ).limit(1)
+        )
+        llm = llm_res.scalar_one_or_none()
+        if llm:
+            if body.model.provider is not None:
+                llm.provider = body.model.provider
+            if body.model.model is not None:
+                llm.model_name = body.model.model
+                llm.name = f"Primary {body.model.model}"
+            if body.model.temperature is not None:
+                llm.temperature = body.model.temperature
+            if body.model.max_tokens is not None:
+                llm.max_tokens = body.model.max_tokens
+            if body.model.api_key:
+                llm.api_key = encrypt_value(body.model.api_key)
+                llm.uses_platform_key = False
+        lc = dict(agent.llm_config or {})
+        if body.model.provider is not None:
+            lc["provider"] = body.model.provider
+        if body.model.model is not None:
+            lc["model"] = body.model.model
+        if body.model.temperature is not None:
+            lc["temperature"] = body.model.temperature
+        if body.model.max_tokens is not None:
+            lc["max_tokens"] = body.model.max_tokens
+        if body.model.api_key:
+            lc["api_key"] = encrypt_value(body.model.api_key)
+            lc["uses_platform_key"] = False
+        agent.llm_config = lc
+
+    pc.setdefault("provider", "vapi")
+    agent.phone_config = pc
+    agent.voice_enabled = True
+    if agent.voice_config is None:
+        agent.voice_config = {"provider": "vapi"}
+    await db.commit()
+
+    return {"success": True, "assistant_id": assistant_id, "updated": True, "message": "Voice assistant configuration synced to Vapi"}
