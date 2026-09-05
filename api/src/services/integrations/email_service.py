@@ -650,7 +650,7 @@ class EmailService:
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <meta http-equiv="X-UA-Compatible" content="IE=edge">
-            <title>Verify Your Email - Synkora AI</title>
+            <title>Verify Your Email - Katexs</title>
             <!--[if mso]>
             <noscript>
                 <xml>
@@ -893,7 +893,7 @@ class EmailService:
                 <div class="email-container">
                     <!-- Header -->
                     <div class="header">
-                        <h1 class="logo">Synkora AI</h1>
+                        <h1 class="logo">Katexs</h1>
                         <p class="tagline">Build AI Agents For Every Role</p>
                     </div>
 
@@ -902,7 +902,7 @@ class EmailService:
                         <h2 class="greeting">Verify Your Email Address</h2>
 
                         <p class="message">
-                            Welcome to Synkora AI! You're one step away from building intelligent
+                            Welcome to Katexs! You're one step away from building intelligent
                             AI agents for your team. Click the button below to verify your email
                             and get started.
                         </p>
@@ -932,7 +932,7 @@ class EmailService:
                     <!-- Footer -->
                     <div class="footer">
                         <p class="footer-text">
-                            If you didn't create an account with Synkora AI, you can safely ignore this email.
+                            If you didn't create an account with Katexs, you can safely ignore this email.
                         </p>
                         <div class="social-links">
                             <a href="{_APP_BASE_URL}">Website</a>
@@ -940,7 +940,7 @@ class EmailService:
                             <a href="mailto:{_SUPPORT_EMAIL}">Support</a>
                         </div>
                         <p class="footer-copyright">
-                            &copy; {datetime.now().year} Synkora AI. All rights reserved.
+                            &copy; {datetime.now().year} Katexs. All rights reserved.
                         </p>
                     </div>
                 </div>
@@ -950,30 +950,30 @@ class EmailService:
         """
 
         text_content = f"""
-        Synkora AI - Build AI Agents For Every Role
+        Katexs - Build AI Agents For Every Role
 
         VERIFY YOUR EMAIL ADDRESS
 
-        Welcome to Synkora AI! You're one step away from building intelligent AI agents for your team.
+        Welcome to Katexs! You're one step away from building intelligent AI agents for your team.
 
         Click this link to verify your email:
         {verification_url}
 
         Note: This link expires in 24 hours for security.
 
-        If you didn't create an account with Synkora AI, you can safely ignore this email.
+        If you didn't create an account with Katexs, you can safely ignore this email.
 
         ---
         Website: {_APP_BASE_URL}
         {("Docs: " + _DOCS_URL) if _DOCS_URL else ""}
         Support: {_SUPPORT_EMAIL}
 
-        (c) {datetime.now().year} Synkora AI. All rights reserved.
+        (c) {datetime.now().year} Katexs. All rights reserved.
         """
 
         return await self.send_email(
             to_email=to_email,
-            subject="Verify Your Email - Synkora AI",
+            subject="Verify Your Email - Katexs",
             html_content=html_content,
             text_content=text_content,
             tenant_id=tenant_id,
@@ -999,7 +999,7 @@ class EmailService:
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <meta http-equiv="X-UA-Compatible" content="IE=edge">
-            <title>Welcome to Synkora AI</title>
+            <title>Welcome to Katexs</title>
             <!--[if mso]>
             <noscript>
                 <xml>
@@ -1228,7 +1228,7 @@ class EmailService:
                 <div class="email-container">
                     <!-- Header -->
                     <div class="header">
-                        <h1 class="logo">Synkora AI</h1>
+                        <h1 class="logo">Katexs</h1>
                         <p class="tagline">Build AI Agents For Every Role</p>
                     </div>
 
@@ -1238,7 +1238,7 @@ class EmailService:
 
                         <p class="intro">
                             Your email is verified and you're ready to start building AI agents
-                            that work 24/7 for your team. Here's what you can do with Synkora AI:
+                            that work 24/7 for your team. Here's what you can do with Katexs:
                         </p>
 
                         <!-- Features -->
@@ -1309,7 +1309,7 @@ class EmailService:
                             <a href="mailto:{_SUPPORT_EMAIL}">Support</a>
                         </div>
                         <p class="footer-copyright">
-                            &copy; {datetime.now().year} Synkora AI. All rights reserved.
+                            &copy; {datetime.now().year} Katexs. All rights reserved.
                         </p>
                     </div>
                 </div>
@@ -1319,7 +1319,7 @@ class EmailService:
         """
 
         text_content = f"""
-        Synkora AI - Build AI Agents For Every Role
+        Katexs - Build AI Agents For Every Role
 
         WELCOME, {display_name.upper()}!
 
@@ -1350,12 +1350,12 @@ class EmailService:
         Website: {_APP_BASE_URL}
         Support: {_SUPPORT_EMAIL}
 
-        (c) {datetime.now().year} Synkora AI. All rights reserved.
+        (c) {datetime.now().year} Katexs. All rights reserved.
         """
 
         return await self.send_email(
             to_email=to_email,
-            subject="Welcome to Synkora AI - Let's Build Your First Agent!",
+            subject="Welcome to Katexs - Let's Build Your First Agent!",
             html_content=html_content,
             text_content=text_content,
             tenant_id=tenant_id,
@@ -1380,7 +1380,7 @@ class EmailService:
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Team Invitation - Synkora</title>
+            <title>Team Invitation - Katexs</title>
             <style>
                 body {{
                     margin: 0;
@@ -1508,12 +1508,12 @@ class EmailService:
             <div class="email-wrapper">
                 <div class="email-container">
                     <div class="header">
-                        <h1 class="logo">Synkora</h1>
+                        <h1 class="logo">Katexs</h1>
                     </div>
                     <div class="content">
                         <h2 class="greeting">You're Invited!</h2>
                         <p class="message">
-                            <strong>{inviter_name}</strong> has invited you to join <strong>{team_name}</strong> on Synkora.
+                            <strong>{inviter_name}</strong> has invited you to join <strong>{team_name}</strong> on Katexs.
                         </p>
                         <div class="invite-box">
                             <div class="invite-detail">
@@ -1553,9 +1553,9 @@ class EmailService:
         """
 
         text_content = f"""
-        You're Invited to Join {team_name} on Synkora!
+        You're Invited to Join {team_name} on Katexs!
 
-        {inviter_name} has invited you to join {team_name} on Synkora.
+        {inviter_name} has invited you to join {team_name} on Katexs.
 
         Team: {team_name}
         Role: {role.capitalize()}
@@ -1573,7 +1573,7 @@ class EmailService:
 
         return await self.send_email(
             to_email=to_email,
-            subject=f"You're invited to join {team_name} on Synkora",
+            subject=f"You're invited to join {team_name} on Katexs",
             html_content=html_content,
             text_content=text_content,
             tenant_id=tenant_id,
@@ -1591,7 +1591,7 @@ class EmailService:
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Reset Your Password - Synkora</title>
+            <title>Reset Your Password - Katexs</title>
             <style>
                 body {{
                     margin: 0;
@@ -1702,7 +1702,7 @@ class EmailService:
             <div class="email-wrapper">
                 <div class="email-container">
                     <div class="header">
-                        <h1 class="logo">Synkora</h1>
+                        <h1 class="logo">Katexs</h1>
                     </div>
                     <div class="content">
                         <h2 class="greeting">Reset Your Password</h2>
