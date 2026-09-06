@@ -179,6 +179,15 @@ def send_welcome_email_task(self, account_id: str, base_url: str = "https://synk
         async_session_factory = create_celery_async_session()
         async with async_session_factory() as db:
             try:
+                from sqlalchemy import text as _t
+                already = await db.execute(
+                    _t("SELECT welcome_email_sent_at FROM accounts WHERE id = :aid"),
+                    {"aid": str(account_id)},
+                )
+                row = already.fetchone()
+                if row and row[0] is not None:
+                    logger.info(f"Welcome email already sent for {account_id} — task bailed")
+                    return {"skipped": True, "reason": "already_sent"}
                 logger.info(f"📧 Sending welcome email for account {account_id}")
 
                 result = await db.execute(select(Account).filter_by(id=uuid.UUID(account_id)))

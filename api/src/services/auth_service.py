@@ -891,14 +891,28 @@ class AuthService:
         await db.commit()
         await db.refresh(account)
 
-        # Queue welcome email
+        # Queue welcome email — ONLY if we atomically claim the one-time flag
+        # (a second verification/activation attempt returns early without sending)
         try:
-            from src.tasks.email_tasks import send_welcome_email_task
-            from src.utils.config_helper import get_app_base_url
+            from sqlalchemy import text as _sqltext
 
-            base_url = await get_app_base_url(db)
-            send_welcome_email_task.delay(account_id=str(account.id), base_url=base_url)
-            logger.info(f"Welcome email task queued for account {account.id}")
+            claimed = await db.execute(
+                _sqltext(
+                    "UPDATE accounts SET welcome_email_sent_at = now() "
+                    "WHERE id = :aid AND welcome_email_sent_at IS NULL RETURNING id"
+                ),
+                {"aid": str(account.id)},
+            )
+            await db.commit()
+            if not claimed.fetchone():
+                logger.info(f"Welcome email already sent for account {account.id} — skipping")
+            else:
+                from src.tasks.email_tasks import send_welcome_email_task
+                from src.utils.config_helper import get_app_base_url
+
+                base_url = await get_app_base_url(db)
+                send_welcome_email_task.delay(account_id=str(account.id), base_url=base_url)
+                logger.info(f"Welcome email task queued for account {account.id}")
         except Exception as e:
             logger.error(f"Failed to queue welcome email: {e}")
 
