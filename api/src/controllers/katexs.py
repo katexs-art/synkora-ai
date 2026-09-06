@@ -1614,3 +1614,184 @@ async def katexs_admin_workspace(
             "message": "Katexs platform settings",
         },
     }
+
+
+# ---------------------------------------------------------------------------
+# Chat sessions (workspace "Chat sessions" UI on katexs.com)
+# ---------------------------------------------------------------------------
+
+class ChatSessionCreate(BaseModel):
+    title: str = Field(..., min_length=1, max_length=200)
+    agent_id: str | None = None
+
+
+class ChatMessageCreate(BaseModel):
+    content: str = Field(..., min_length=1, max_length=8000)
+    role: str = Field(default="user", pattern="^(user|assistant|system)$")
+
+
+@compat_router.get("/chat/sessions")
+async def katexs_chat_sessions_list(
+    account: Account = Depends(get_current_account),
+    db: AsyncSession = Depends(get_async_db),
+):
+    """List the account's chat sessions (newest activity first)."""
+    from sqlalchemy import text as sqltext
+
+    rows = (await db.execute(sqltext(
+        "SELECT c.id, c.name, c.agent_id, c.last_activity_at, c.created_at, "
+        "(SELECT count(*) FROM messages m WHERE m.conversation_id = c.id) AS msg_count "
+        "FROM conversations c WHERE c.account_id = :a AND c.source = 'chat' "
+        "ORDER BY COALESCE(c.last_activity_at, c.created_at) DESC LIMIT 100"
+    ), {"a": str(account.id)})).fetchall()
+    return {
+        "success": True,
+        "data": [
+            {
+                "id": str(r[0]),
+                "title": r[1],
+                "agent_id": str(r[2]) if r[2] else None,
+                "message_count": int(r[4] or 0),
+                "updated_at": r[3].isoformat() if r[3] else None,
+                "created_at": r[4].isoformat() if r[4] else None,
+            }
+            for r in rows
+        ],
+    }
+
+
+@compat_router.post("/chat/sessions")
+async def katexs_chat_sessions_create(
+    body: ChatSessionCreate,
+    account: Account = Depends(get_current_account),
+    tenant_id: uuid.UUID = Depends(get_current_tenant_id),
+    db: AsyncSession = Depends(get_async_db),
+):
+    from sqlalchemy import text as sqltext
+
+    agent_id = None
+    if body.agent_id:
+        agent = await _resolve_agent(db, tenant_id, body.agent_id)
+        agent_id = agent.id
+    sid = str(uuid.uuid4())
+    await db.execute(sqltext(
+        "INSERT INTO conversations (id, account_id, agent_id, name, status, source, message_count, handoff_status, summary_message_count, total_tokens_estimated, created_at, updated_at, last_activity_at) "
+        "VALUES (:id, :a, :ag, :n, 'ACTIVE', 'chat', 0, 'none', 0, 0, now(), now(), now())"
+    ), {"id": sid, "a": str(account.id), "ag": str(agent_id) if agent_id else None, "n": body.title[:200]})
+    await db.commit()
+    return {"success": True, "data": {"id": sid, "title": body.title, "agent_id": str(agent_id) if agent_id else None}}
+
+
+@compat_router.get("/chat/sessions/{session_id}")
+async def katexs_chat_sessions_get(
+    session_id: str,
+    account: Account = Depends(get_current_account),
+    db: AsyncSession = Depends(get_async_db),
+):
+    from sqlalchemy import text as sqltext
+
+    conv = (await db.execute(sqltext(
+        "SELECT id, name, agent_id FROM conversations WHERE id = :id AND account_id = :a AND source = 'chat'"
+    ), {"id": session_id, "a": str(account.id)})).fetchone()
+    if not conv:
+        raise HTTPException(status_code=404, detail="Chat session not found")
+    msgs = (await db.execute(sqltext(
+        "SELECT role, content, created_at FROM messages WHERE conversation_id = :id ORDER BY COALESCE(position, 0), created_at ASC LIMIT 500"
+    ), {"id": session_id})).fetchall()
+    return {
+        "success": True,
+        "data": {
+            "id": str(conv[0]),
+            "title": conv[1],
+            "agent_id": str(conv[2]) if conv[2] else None,
+            "messages": [{"role": m[0], "content": m[1], "created_at": m[2].isoformat() if m[2] else None} for m in msgs],
+        },
+    }
+
+
+@compat_router.post("/chat/sessions/{session_id}/messages")
+async def katexs_chat_sessions_message(
+    session_id: str,
+    body: ChatMessageCreate,
+    account: Account = Depends(get_current_account),
+    tenant_id: uuid.UUID = Depends(get_current_tenant_id),
+    db: AsyncSession = Depends(get_async_db),
+):
+    """Add a message. If the session is linked to an agent and role=user, the agent brain replies (persisted)."""
+    from sqlalchemy import text as sqltext
+
+    conv = (await db.execute(sqltext(
+        "SELECT id, name, agent_id FROM conversations WHERE id = :id AND account_id = :a AND source = 'chat'"
+    ), {"id": session_id, "a": str(account.id)})).fetchone()
+    if not conv:
+        raise HTTPException(status_code=404, detail="Chat session not found")
+
+    agent_id = conv[2]
+    if not agent_id or body.role != "user":
+        # plain store
+        mid = str(uuid.uuid4())
+        await db.execute(sqltext(
+            "INSERT INTO messages (id, conversation_id, role, content, message_metadata, status, token_count, created_at, updated_at) "
+            "VALUES (:id, :c, :r, :content, '{}', 'COMPLETED', 0, now(), now())"
+        ), {"id": mid, "c": session_id, "r": body.role, "content": body.content})
+        await db.execute(sqltext("UPDATE conversations SET last_activity_at = now(), updated_at = now() WHERE id = :id"), {"id": session_id})
+        await db.commit()
+        return {"success": True, "data": {"role": body.role, "content": body.content, "id": mid}}
+
+    # agent-linked: run the brain (engine persists user + assistant messages itself)
+    agent = await db.get(Agent, uuid.UUID(str(agent_id)))
+    if not agent:
+        raise HTTPException(status_code=404, detail="Session agent not found")
+
+    from src.services.conversation_service import ConversationService
+    from src.services.agents.agent_loader_service import AgentLoaderService
+    from src.services.agents.agent_manager import AgentManager
+    from src.services.agents.chat_service import ChatService
+    from src.services.agents.chat_stream_service import ChatStreamService
+
+    history = await ConversationService.get_conversation_history_cached(db=db, conversation_id=uuid.UUID(session_id), limit=30)
+    stream = ChatStreamService(agent_loader=AgentLoaderService(AgentManager()), chat_service=ChatService())
+    chunks = []
+    async for event_data in stream.stream_agent_response(
+        agent_name=agent.slug,
+        message=body.content,
+        conversation_history=history,
+        conversation_id=session_id,
+        attachments=None,
+        llm_config_id=None,
+        db=db,
+        user_id=str(account.id),
+        tenant_id=tenant_id,
+        trigger_source="chat_session",
+        trigger_detail="",
+    ):
+        if event_data.startswith("data: "):
+            try:
+                evt = json.loads(event_data[6:])
+                if evt.get("type") == "chunk":
+                    chunks.append(evt.get("content", ""))
+            except Exception:
+                pass
+    reply = "".join(chunks).strip() or "Sorry, I did not catch that."
+    await db.execute(sqltext("UPDATE conversations SET last_activity_at = now(), updated_at = now() WHERE id = :id"), {"id": session_id})
+    await db.commit()
+    return {"success": True, "data": {"role": "user", "content": body.content}, "reply": {"role": "assistant", "content": reply}}
+
+
+@compat_router.delete("/chat/sessions/{session_id}")
+async def katexs_chat_sessions_delete(
+    session_id: str,
+    account: Account = Depends(get_current_account),
+    db: AsyncSession = Depends(get_async_db),
+):
+    from sqlalchemy import text as sqltext
+
+    conv = (await db.execute(sqltext(
+        "SELECT id FROM conversations WHERE id = :id AND account_id = :a AND source = 'chat'"
+    ), {"id": session_id, "a": str(account.id)})).fetchone()
+    if not conv:
+        raise HTTPException(status_code=404, detail="Chat session not found")
+    await db.execute(sqltext("DELETE FROM messages WHERE conversation_id = :id"), {"id": session_id})
+    await db.execute(sqltext("DELETE FROM conversations WHERE id = :id"), {"id": session_id})
+    await db.commit()
+    return {"success": True, "deleted": True}
